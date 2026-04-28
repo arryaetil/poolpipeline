@@ -4,9 +4,21 @@ export function extractJson(text) {
   try {
     return JSON.parse(text);
   } catch {
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error(`No JSON found in response: ${text.slice(0, 200)}`);
-    return JSON.parse(m[0]);
+    // Walk forward finding the first valid JSON object by counting braces
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] !== '{') continue;
+      let depth = 0;
+      for (let j = i; j < text.length; j++) {
+        if (text[j] === '{') depth++;
+        else if (text[j] === '}') {
+          depth--;
+          if (depth === 0) {
+            try { return JSON.parse(text.slice(i, j + 1)); } catch { break; }
+          }
+        }
+      }
+    }
+    throw new Error(`No JSON found in response: ${text.slice(0, 200)}`);
   }
 }
 
@@ -15,6 +27,7 @@ export function makeSlug(formattedAddress, featureId) {
     .toLowerCase()
     .replace(/[^a-z0-9\s-]+/g, '')
     .replace(/\s+/g, '-')
+    .replace(/-{2,}/g, '-')
     .replace(/^-|-$/g, '');
 }
 
