@@ -1,0 +1,62 @@
+[
+  {
+    "id": "pool",
+    "label": "Swimming pool",
+    "emoji": "🏊",
+    "camera_pitch": -50,
+    "camera_range": 130,
+    "analysis_hint": "Recommend an inground swimming pool strictly in the backyard.",
+    "edit_prompt": "Add a photorealistic inground swimming pool with blue water, light stone coping, and a few lounge chairs.",
+    "video_prompt": "Sparkling blue pool water with gentle ripples, warm golden-hour lighting."
+  },
+  {
+    "id": "deck",
+    "label": "Deck / patio",
+    "emoji": "🪵",
+    "camera_pitch": -55,
+    "camera_range": 120,
+    "analysis_hint": "Recommend a wooden deck or stone patio strictly in the backyard.",
+    "edit_prompt": "Add a photorealistic wooden deck with outdoor furniture and string lights.",
+    "video_prompt": "Warm evening light on a wooden deck, subtle breeze, string lights glowing."
+  },
+  {
+    "id": "adu",
+    "label": "ADU / garden studio",
+    "emoji": "🏡",
+    "camera_pitch": -50,
+    "camera_range": 140,
+    "analysis_hint": "Recommend an accessory dwelling unit or garden studio strictly in the backyard. Ensure adequate setback from fences.",
+    "edit_prompt": "Add a photorealistic modern garden studio or ADU with a small path leading to it.",
+    "video_prompt": "Warm afternoon light on a modern garden studio, lush surrounding landscaping."
+  },
+  {
+    "id": "turf",
+    "label": "Synthetic turf",
+    "emoji": "🌿",
+    "camera_pitch": -52,
+    "camera_range": 125,
+    "analysis_hint": "Recommend replacing the backyard lawn with synthetic turf.",
+    "edit_prompt": "Replace the backyard grass with photorealistic synthetic turf — perfectly even, vivid green.",
+    "video_prompt": "Perfectly manicured synthetic turf, bright afternoon sun, no shadows."
+  },
+  {
+    "id": "pickleball",
+    "label": "Pickleball court",
+    "emoji": "🏓",
+    "camera_pitch": -55,
+    "camera_range": 150,
+    "analysis_hint": "Recommend a pickleball court (13.4m × 6.1m) strictly in the backyard.",
+    "edit_prompt": "Add a photorealistic outdoor pickleball court with blue/green surface, white lines, and a net.",
+    "video_prompt": "Bright midday light on a crisp pickleball court, slight lens flare."
+  },
+  {
+    "id": "solar",
+    "label": "Solar panels",
+    "emoji": "☀️",
+    "camera_pitch": -70,
+    "camera_range": 110,
+    "analysis_hint": "Recommend solar panel placement on the south-facing roof sections.",
+    "edit_prompt": "Add photorealistic solar panels on the south-facing roof — flush-mounted, dark blue panels in a clean grid.",
+    "video_prompt": "Golden-hour light glinting off solar panels, subtle drone pull-back."
+  }
+]
