@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cesium Render</title>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+    html, body, #c { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; }
+  </style>
+</head>
+<body>
+<div id="c"></div>
+<script>
+(async () => {
+  const p = new URLSearchParams(location.search);
+  const key     = p.get('key');
+  const lat     = parseFloat(p.get('lat'));
+  const lng     = parseFloat(p.get('lng'));
+  const heading = parseFloat(p.get('heading'));
+  const pitch   = parseFloat(p.get('pitch'));
+  const range   = parseFloat(p.get('range'));
+
+  Cesium.Ion.defaultAccessToken = '';
+
+  const viewer = new Cesium.Viewer('c', {
+    animation: false,
+    baseLayerPicker: false,
+    fullscreenButton: false,
+    geocoder: false,
+    homeButton: false,
+    infoBox: false,
+    sceneModePicker: false,
+    selectionIndicator: false,
+    timeline: false,
+    navigationHelpButton: false,
+    skyBox: false,
+    skyAtmosphere: false,
+  });
+
+  viewer.scene.globe.show = false;
+
+  const tileset = await Cesium.Cesium3DTileset.fromUrl(
+    `https://tile.googleapis.com/v1/3dtiles/root.json?key=${key}`
+  );
+  viewer.scene.primitives.add(tileset);
+
+  const center = Cesium.Cartesian3.fromDegrees(lng, lat, 0);
+  viewer.camera.lookAt(
+    center,
+    new Cesium.HeadingPitchRange(
+      Cesium.Math.toRadians(heading),
+      Cesium.Math.toRadians(pitch),
+      range
+    )
+  );
+  viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+
+  // Wait until tiles stop streaming for 30 consecutive frames, or 25s
+  let stable = 0;
+  await new Promise(resolve => {
+    const tid = setTimeout(resolve, 25000);
+    (function tick() {
+      viewer.render();
+      stable = tileset.tilesLoaded ? stable + 1 : 0;
+      if (stable >= 30) { clearTimeout(tid); return resolve(); }
+      requestAnimationFrame(tick);
+    })();
+  });
+
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
