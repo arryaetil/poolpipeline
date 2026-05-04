@@ -93,3 +93,21 @@ test('chosen.json write is correctly wired after view_select emit', () => {
     'server.js must write chosen.json with chosen_heading after view_select'
   );
 });
+
+test('GET /demo-runs route is registered', () => {
+  assert.equal(hasRoute('get', '/demo-runs'), true);
+});
+
+test('GET /demo-runs returns an array', async () => {
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+  try {
+    const { port } = server.address();
+    const res = await fetch(`http://127.0.0.1:${port}/demo-runs`);
+    const body = await res.json();
+    assert.equal(res.status, 200);
+    assert.ok(Array.isArray(body));
+  } finally {
+    await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve()));
+  }
+});

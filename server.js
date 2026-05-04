@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -36,6 +36,16 @@ app.get('/cesium.html', (_req, res) => {
 
 app.get('/features', (_req, res) => {
   res.json(features);
+});
+
+app.get('/demo-runs', (_req, res) => {
+  const outputDir = join(__dirname, 'output');
+  if (!existsSync(outputDir)) return res.json([]);
+  const runs = readdirSync(outputDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name)
+    .filter((name) => existsSync(join(outputDir, name, 'edited.png')));
+  res.json(runs);
 });
 
 app.post('/run', async (req, res) => {
