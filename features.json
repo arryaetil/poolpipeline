@@ -2,6 +2,7 @@
   {
     "id": "pool",
     "label": "Zwembad",
+    "label_en": "swimming pool",
     "emoji": "🏊",
     "camera_pitch": -50,
     "camera_range": 130,
@@ -12,6 +13,7 @@
   {
     "id": "adu",
     "label": "Tuinhuis",
+    "label_en": "garden studio",
     "emoji": "🏡",
     "camera_pitch": -50,
     "camera_range": 140,
@@ -22,6 +24,7 @@
   {
     "id": "solar",
     "label": "Zonnepanelen",
+    "label_en": "solar panels",
     "emoji": "☀️",
     "camera_pitch": -70,
     "camera_range": 110,
