@@ -1,7 +1,7 @@
 [
   {
     "id": "pool",
-    "label": "Swimming pool",
+    "label": "Zwembad",
     "emoji": "🏊",
     "camera_pitch": -50,
     "camera_range": 130,
@@ -10,18 +10,8 @@
     "video_prompt": "Sparkling blue pool water with gentle ripples, warm golden-hour lighting."
   },
   {
-    "id": "deck",
-    "label": "Deck / patio",
-    "emoji": "🪵",
-    "camera_pitch": -55,
-    "camera_range": 120,
-    "analysis_hint": "Recommend a wooden deck or stone patio strictly in the backyard.",
-    "edit_prompt": "Add a photorealistic wooden deck with outdoor furniture and string lights.",
-    "video_prompt": "Warm evening light on a wooden deck, subtle breeze, string lights glowing."
-  },
-  {
     "id": "adu",
-    "label": "ADU / garden studio",
+    "label": "Tuinhuis",
     "emoji": "🏡",
     "camera_pitch": -50,
     "camera_range": 140,
@@ -30,28 +20,8 @@
     "video_prompt": "Warm afternoon light on a modern garden studio, lush surrounding landscaping."
   },
   {
-    "id": "turf",
-    "label": "Synthetic turf",
-    "emoji": "🌿",
-    "camera_pitch": -52,
-    "camera_range": 125,
-    "analysis_hint": "Recommend replacing the backyard lawn with synthetic turf.",
-    "edit_prompt": "Replace the backyard grass with photorealistic synthetic turf — perfectly even, vivid green.",
-    "video_prompt": "Perfectly manicured synthetic turf, bright afternoon sun, no shadows."
-  },
-  {
-    "id": "pickleball",
-    "label": "Pickleball court",
-    "emoji": "🏓",
-    "camera_pitch": -55,
-    "camera_range": 150,
-    "analysis_hint": "Recommend a pickleball court (13.4m × 6.1m) strictly in the backyard.",
-    "edit_prompt": "Add a photorealistic outdoor pickleball court with blue/green surface, white lines, and a net.",
-    "video_prompt": "Bright midday light on a crisp pickleball court, slight lens flare."
-  },
-  {
     "id": "solar",
-    "label": "Solar panels",
+    "label": "Zonnepanelen",
     "emoji": "☀️",
     "camera_pitch": -70,
     "camera_range": 110,
