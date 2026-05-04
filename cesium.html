@@ -45,7 +45,20 @@
   );
   viewer.scene.primitives.add(tileset);
 
-  const center = Cesium.Cartesian3.fromDegrees(lng, lat, 0);
+  let targetHeight = 80;
+  try {
+    const cartographic = Cesium.Cartographic.fromDegrees(lng, lat);
+    viewer.scene.render();
+    await viewer.scene.sampleHeightMostDetailed([cartographic]);
+    if (Number.isFinite(cartographic.height)) {
+      targetHeight = cartographic.height + 8;
+    }
+  } catch {
+    // Some photorealistic tile areas do not expose sampleable height quickly.
+    // Use a raised target so hilly locations do not render from below ground.
+  }
+
+  const center = Cesium.Cartesian3.fromDegrees(lng, lat, targetHeight);
   viewer.camera.lookAt(
     center,
     new Cesium.HeadingPitchRange(
