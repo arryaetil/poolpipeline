@@ -86,8 +86,10 @@ test('POST /run rejects a bad body before external API checks', async () => {
   }
 });
 
-test('chosen.json is written by the pipeline route handler (unit check on writeFileSync call)', () => {
-  // Verify server.js source contains the chosen.json write
+test('chosen.json write is correctly wired after view_select emit', () => {
   const src = readFileSync(new URL('../server.js', import.meta.url), 'utf8');
-  assert.ok(src.includes('chosen.json'), 'server.js must write chosen.json');
+  assert.ok(
+    src.includes("'chosen.json'") && src.includes('viewResult.chosen_heading'),
+    'server.js must write chosen.json with chosen_heading after view_select'
+  );
 });

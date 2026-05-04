@@ -101,7 +101,7 @@ app.post('/run', async (req, res) => {
     currentStep = 'view_select';
     const viewResult = await selectView(renders, satB64, analysis, OR_KEY);
     emit('step', { step: 'view_select', status: 'done', value: viewResult });
-    writeFileSync(join(outDir, 'chosen.json'), JSON.stringify({ heading: viewResult.chosen_heading }));
+    writeFileSync(join(outDir, 'chosen.json'), JSON.stringify({ heading: viewResult.chosen_heading, reason: viewResult.reason }, null, 2));
 
     const chosenRender = renders.find((item) => item.heading === viewResult.chosen_heading) ?? renders[0];
 
