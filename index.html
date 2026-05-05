@@ -60,31 +60,6 @@ body {
 
 .hidden { display: none !important; }
 
-/* Demo toggle */
-.demo-bar {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 18px; font-size: 12px; color: rgba(255,255,255,0.4);
-}
-.demo-toggle-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-.demo-toggle {
-  width: 36px; height: 20px; background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12); border-radius: 99px;
-  position: relative; cursor: pointer; transition: background 0.2s, border-color 0.2s;
-  flex-shrink: 0;
-}
-.demo-toggle.on { background: rgba(184,148,63,0.4); border-color: rgba(184,148,63,0.5); }
-.demo-toggle::after {
-  content: ''; position: absolute; width: 14px; height: 14px;
-  background: rgba(255,255,255,0.8); border-radius: 50%;
-  top: 2px; left: 2px; transition: transform 0.2s;
-}
-.demo-toggle.on::after { transform: translateX(16px); }
-.demo-select {
-  margin-left: 6px; background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);
-  border-radius: 8px; padding: 4px 10px; font-size: 11px;
-  font-family: inherit; cursor: pointer; max-width: 200px;
-}
 
 /* Hero */
 .hero { padding: 52px 36px 44px; text-align: center; }
@@ -334,15 +309,6 @@ body {
 <body>
 <div class="page">
 
-  <!-- Demo toggle -->
-  <div class="demo-bar glass">
-    <div class="demo-toggle-wrap" id="demoToggleWrap">
-      <div class="demo-toggle" id="demoToggle"></div>
-      <span>Demo modus</span>
-    </div>
-    <select class="demo-select hidden" id="demoSelect"></select>
-  </div>
-
   <!-- Hero -->
   <div class="hero glass">
     <div class="eyebrow"><i data-lucide="sparkles"></i>AI visualisatie tool voor installateurs en aannemers</div>
@@ -481,7 +447,6 @@ let selectedFeatureId = null;
 let rendersCount = 0;
 let chosenRenderSrc = null;
 let editedSrc = null;
-let demoMode = false;
 const renderStore = {};
 
 const ICON_MAP = { pool: 'waves', adu: 'house', solar: 'sun' };
@@ -605,7 +570,6 @@ function handleError({ step, message }) {
 
 // Run pipeline
 async function run() {
-  if (demoMode) return;
   const address = document.getElementById('addrInput').value.trim();
   if (!address) { alert('Voer een adres in'); return; }
   if (!selectedFeatureId) { alert('Kies een product'); return; }
@@ -721,56 +685,10 @@ function reset() {
   document.getElementById('addrInput').focus();
 }
 
-// Demo mode
-const DEMO_LABEL = { pool: 'Zwembad', adu: 'Tuinhuis', solar: 'Zonnepanelen' };
-
-async function loadDemoRuns() {
-  const res = await fetch('/demo-runs');
-  const allRuns = await res.json();
-  const ORDER = ['russellaan-4-6132-as-sittard-netherlands-pool', 'russellaan-4-6132-as-sittard-netherlands-adu', 'russellaan-4-6132-as-sittard-netherlands-solar'];
-  const runs = ORDER.filter(r => allRuns.includes(r));
-  const sel = document.getElementById('demoSelect');
-  sel.innerHTML = runs.map((r) => {
-    const feature = r.split('-').pop();
-    const label = DEMO_LABEL[feature] ?? feature;
-    return `<option value="${escHtml(r)}">${escHtml(label)}</option>`;
-  }).join('');
-  if (runs.length > 0) loadDemoRun(runs[0]);
-  sel.addEventListener('change', () => loadDemoRun(sel.value));
-}
-
-async function loadDemoRun(slug) {
-  document.getElementById('progressCard').classList.add('hidden');
-  let heading = 0;
-  try {
-    const res = await fetch(`/output/${slug}/chosen.json`);
-    if (res.ok) { const j = await res.json(); heading = j.heading ?? 0; }
-  } catch (_) {}
-  const before = `/output/${slug}/render-${heading}.png`;
-  const after = `/output/${slug}/edited.png`;
-  editedSrc = after;
-  showResult(before, after);
-}
-
-function toggleDemo() {
-  demoMode = !demoMode;
-  document.getElementById('demoToggle').classList.toggle('on', demoMode);
-  document.getElementById('demoSelect').classList.toggle('hidden', !demoMode);
-  document.getElementById('genBtn').disabled = demoMode;
-  if (demoMode) loadDemoRuns();
-  else {
-    ['progressCard','previewCard','analysisCard','resultCard'].forEach(id => {
-      document.getElementById(id).classList.add('hidden');
-    });
-    resetSteps();
-  }
-}
-
 // Event listeners
 document.getElementById('genBtn').addEventListener('click', run);
 document.getElementById('btnDownload').addEventListener('click', download);
 document.getElementById('btnReset').addEventListener('click', reset);
-document.getElementById('demoToggleWrap').addEventListener('click', toggleDemo);
 document.getElementById('addrInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
 
 // Init
