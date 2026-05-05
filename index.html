@@ -20,7 +20,29 @@ body {
   padding: 40px 24px 60px;
 }
 
-.page { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.page { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+.main-grid { display: contents; }
+.left-panel { display: contents; }
+
+@media (min-width: 860px) {
+  body { padding: 48px 60px 80px; }
+  .before-after { height: 520px !important; }
+  .headline { font-size: 56px; }
+  .hero { padding: 64px 60px 52px; }
+  .usecase-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .input-card { padding: 40px 36px; }
+  .result-card { padding: 36px 36px; }
+  .progress-card { padding: 36px 36px; }
+  .feat-card { padding: 28px 16px 22px; }
+  .feat-icon i { width: 32px; height: 32px; }
+  .feat-name { font-size: 14px; }
+  .addr-input { font-size: 17px; padding: 18px 22px; }
+  .gen-btn { padding: 20px; font-size: 17px; }
+  .step-text { font-size: 16px; }
+  .step { width: 320px; }
+  .step-dot { width: 30px; height: 30px; }
+}
 
 .glass {
   background: rgba(255,255,255,0.045);
@@ -157,6 +179,48 @@ body {
 .step-text-pending { color: rgba(255,255,255,0.18); }
 .error-msg { color: rgba(255,100,100,0.9); font-size: 13px; text-align: center; padding: 14px 0 2px; }
 
+/* Preview card */
+.preview-card { padding: 28px 28px; }
+.live-preview {
+  border-radius: 14px; overflow: hidden;
+  position: relative; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07); aspect-ratio: 1 / 1;
+  max-height: 280px; width: 100%;
+}
+.live-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+}
+.live-preview img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: opacity 0.5s ease;
+}
+.live-label {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.65);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 4px 12px; border-radius: 99px; white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Analysis card */
+.analysis-card { padding: 28px 28px; }
+.analysis-fields { display: flex; flex-direction: column; gap: 12px; }
+.af-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px;
+  color: rgba(184,148,63,0.7); font-weight: 600; margin-bottom: 5px;
+}
+.af-value {
+  font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.65;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; padding: 10px 14px;
+}
+.analysis-placeholder {
+  font-size: 13px; color: rgba(255,255,255,0.2); font-style: italic;
+  padding: 10px 0;
+}
+
 /* Result card */
 .result-card { padding: 28px 28px; }
 .before-after {
@@ -164,6 +228,7 @@ body {
   background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
   margin-bottom: 18px; cursor: col-resize;
 }
+.ba-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .ba-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ba-img-after { clip-path: inset(0 0 0 50%); }
 .ba-tag {
@@ -288,6 +353,9 @@ body {
     <p class="subline">Genereer een gepersonaliseerde tuinvisualisatie voor elk klantadres en zet prospects om in concrete gesprekken.</p>
   </div>
 
+  <div class="main-grid">
+  <div class="left-panel">
+
   <!-- Input card -->
   <div class="input-card glass">
     <span class="sect-label">Voer een klantadres in</span>
@@ -316,22 +384,51 @@ body {
     <div id="progressError"></div>
   </div>
 
+  <!-- Preview card -->
+  <div class="preview-card glass hidden" id="previewCard">
+    <span class="sect-label">Visuele voortgang</span>
+    <div class="live-preview" id="livePreview">
+      <div class="live-placeholder" id="livePlaceholder">
+        <i data-lucide="image" style="width:36px;height:36px;color:rgba(255,255,255,0.1);"></i>
+        <span style="font-size:13px;color:rgba(255,255,255,0.18);">Luchtfoto wordt geladen...</span>
+      </div>
+      <img id="liveImg" src="" alt="" class="hidden">
+      <div class="live-label hidden" id="liveLabel"></div>
+    </div>
+  </div>
+
+  <!-- Analysis card -->
+  <div class="analysis-card glass hidden" id="analysisCard">
+    <span class="sect-label">Perceel analyse</span>
+    <div id="analysisBody">
+      <div class="analysis-placeholder">Analyse wordt uitgevoerd...</div>
+    </div>
+  </div>
+
+  </div><!-- end left-panel -->
+
   <!-- Result card -->
   <div class="result-card glass hidden" id="resultCard">
     <span class="sect-label">Resultaat</span>
     <div class="before-after" id="sliderContainer">
-      <img class="ba-img ba-img-before" id="imgBefore" src="" alt="Voor">
-      <img class="ba-img ba-img-after" id="imgAfter" src="" alt="Na">
-      <div class="ba-tag ba-before">Voor</div>
-      <div class="ba-tag ba-after">Na</div>
-      <div class="ba-divider" id="baDivider"></div>
-      <div class="ba-handle" id="baHandle"><i data-lucide="move-horizontal"></i></div>
+      <div class="ba-placeholder" id="baPlaceholder">
+        <i data-lucide="image" style="width:40px;height:40px;color:rgba(255,255,255,0.12);margin-bottom:12px;"></i>
+        <span style="font-size:14px;color:rgba(255,255,255,0.2);">Visualisatie verschijnt hier</span>
+      </div>
+      <img class="ba-img ba-img-before hidden" id="imgBefore" src="" alt="Voor">
+      <img class="ba-img ba-img-after hidden" id="imgAfter" src="" alt="Na">
+      <div class="ba-tag ba-before hidden" id="tagBefore">Voor</div>
+      <div class="ba-tag ba-after hidden" id="tagAfter">Na</div>
+      <div class="ba-divider hidden" id="baDivider"></div>
+      <div class="ba-handle hidden" id="baHandle"><i data-lucide="move-horizontal"></i></div>
     </div>
     <div class="action-btns">
       <button class="btn-dl" id="btnDownload" type="button"><i data-lucide="download"></i>Download render</button>
       <button class="btn-reset" id="btnReset" type="button"><i data-lucide="rotate-ccw"></i>Nieuw adres</button>
     </div>
   </div>
+
+  </div><!-- end main-grid -->
 
   <!-- Divider -->
   <div class="section-divider">
@@ -435,15 +532,53 @@ function resetSteps() {
   STEP_IDS.forEach((id) => setStep(id, 'pending'));
   document.getElementById('txt-renders').textContent = '3D renders gemaakt';
   document.getElementById('progressError').innerHTML = '';
+  const img = document.getElementById('liveImg');
+  img.src = '';
+  img.classList.add('hidden');
+  document.getElementById('liveLabel').classList.add('hidden');
+  document.getElementById('livePlaceholder').classList.remove('hidden');
+  document.getElementById('analysisBody').innerHTML = '<div class="analysis-placeholder">Analyse wordt uitgevoerd...</div>';
+}
+
+// Live preview
+function showLivePreview(src, label) {
+  const img = document.getElementById('liveImg');
+  const lbl = document.getElementById('liveLabel');
+  img.style.opacity = '0';
+  img.onload = () => { img.style.opacity = '1'; };
+  img.src = src.startsWith('data:') ? src : `data:image/png;base64,${src}`;
+  lbl.textContent = label;
+  img.classList.remove('hidden');
+  lbl.classList.remove('hidden');
+  document.getElementById('livePlaceholder').classList.add('hidden');
+}
+
+function showAnalysis(analysis) {
+  const body = document.getElementById('analysisBody');
+  body.innerHTML = `
+    <div class="analysis-fields">
+      <div><div class="af-label">Achterkant perceel</div><div class="af-value">${escHtml(analysis.backyard ?? '—')}</div></div>
+      <div><div class="af-label">Obstakels</div><div class="af-value">${escHtml(analysis.obstructions ?? '—')}</div></div>
+      <div><div class="af-label">Aanbeveling</div><div class="af-value">${escHtml(analysis.recommendation ?? '—')}</div></div>
+    </div>`;
 }
 
 // SSE handlers
 function handleStep({ step, status, value }) {
   if (step === 'geocode') { setStep('geocode', 'done'); setStep('satellite', 'active'); }
-  if (step === 'satellite') { setStep('satellite', 'done'); setStep('analysis', 'active'); }
-  if (step === 'analysis') { setStep('analysis', 'done'); setStep('renders', 'active'); }
+  if (step === 'satellite') {
+    setStep('satellite', 'done'); setStep('analysis', 'active');
+    showLivePreview(value, 'Luchtfoto');
+  }
+  if (step === 'analysis') {
+    setStep('analysis', 'done'); setStep('renders', 'active');
+    showAnalysis(value);
+  }
   if (step === 'renders') {
-    if (value?.image) renderStore[value.heading] = value.image;
+    if (value?.image) {
+      renderStore[value.heading] = value.image;
+      showLivePreview(value.image, `3D render ${rendersCount + 1} / 4`);
+    }
     rendersCount += 1;
     document.getElementById('txt-renders').textContent = `3D renders gemaakt (${rendersCount} / 4)`;
     if (rendersCount === 4) { setStep('renders', 'done'); setStep('view_select', 'active'); }
@@ -452,10 +587,12 @@ function handleStep({ step, status, value }) {
     setStep('view_select', 'done');
     setStep('edit', 'active');
     chosenRenderSrc = renderStore[value.chosen_heading] ?? null;
+    if (chosenRenderSrc) showLivePreview(chosenRenderSrc, 'Gekozen hoek');
   }
   if (step === 'edit') {
     setStep('edit', 'done');
     editedSrc = value;
+    showLivePreview(editedSrc, 'Visualisatie klaar');
     showResult(chosenRenderSrc, editedSrc);
   }
 }
@@ -477,7 +614,9 @@ async function run() {
   chosenRenderSrc = null;
   editedSrc = null;
   document.getElementById('progressCard').classList.remove('hidden');
-  document.getElementById('resultCard').classList.add('hidden');
+  document.getElementById('previewCard').classList.remove('hidden');
+  document.getElementById('analysisCard').classList.remove('hidden');
+  document.getElementById('resultCard').classList.remove('hidden');
   document.getElementById('genBtn').disabled = true;
   setStep('geocode', 'active');
 
@@ -544,12 +683,17 @@ function initSlider() {
 
 function showResult(beforeSrc, afterSrc) {
   if (!beforeSrc || !afterSrc) return;
-  document.getElementById('imgBefore').src = beforeSrc;
+  const beforeSrcFull = beforeSrc.startsWith('data:') ? beforeSrc : `data:image/png;base64,${beforeSrc}`;
+  document.getElementById('imgBefore').src = beforeSrcFull;
   document.getElementById('imgAfter').src = afterSrc;
   document.getElementById('imgAfter').style.clipPath = 'inset(0 0 0 50%)';
   document.getElementById('baHandle').style.left = '50%';
   document.getElementById('baDivider').style.left = '50%';
-  document.getElementById('resultCard').classList.remove('hidden');
+  document.getElementById('baPlaceholder').classList.add('hidden');
+  ['imgBefore','imgAfter','tagBefore','tagAfter','baDivider','baHandle'].forEach(id => {
+    document.getElementById(id).classList.remove('hidden');
+  });
+  lucide.createIcons({ nodes: [document.getElementById('baHandle')] });
 }
 
 // Download
@@ -564,20 +708,33 @@ function download() {
 // Reset
 function reset() {
   document.getElementById('addrInput').value = '';
-  document.getElementById('progressCard').classList.add('hidden');
-  document.getElementById('resultCard').classList.add('hidden');
+  ['progressCard','previewCard','analysisCard','resultCard'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
   resetSteps();
   chosenRenderSrc = null;
   editedSrc = null;
+  document.getElementById('baPlaceholder').classList.remove('hidden');
+  ['imgBefore','imgAfter','tagBefore','tagAfter','baDivider','baHandle'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
   document.getElementById('addrInput').focus();
 }
 
 // Demo mode
+const DEMO_LABEL = { pool: 'Zwembad', adu: 'Tuinhuis', solar: 'Zonnepanelen' };
+
 async function loadDemoRuns() {
   const res = await fetch('/demo-runs');
-  const runs = await res.json();
+  const allRuns = await res.json();
+  const ORDER = ['russellaan-4-6132-as-sittard-netherlands-pool', 'russellaan-4-6132-as-sittard-netherlands-adu', 'russellaan-4-6132-as-sittard-netherlands-solar'];
+  const runs = ORDER.filter(r => allRuns.includes(r));
   const sel = document.getElementById('demoSelect');
-  sel.innerHTML = runs.map((r) => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+  sel.innerHTML = runs.map((r) => {
+    const feature = r.split('-').pop();
+    const label = DEMO_LABEL[feature] ?? feature;
+    return `<option value="${escHtml(r)}">${escHtml(label)}</option>`;
+  }).join('');
   if (runs.length > 0) loadDemoRun(runs[0]);
   sel.addEventListener('change', () => loadDemoRun(sel.value));
 }
@@ -602,8 +759,9 @@ function toggleDemo() {
   document.getElementById('genBtn').disabled = demoMode;
   if (demoMode) loadDemoRuns();
   else {
-    document.getElementById('progressCard').classList.add('hidden');
-    document.getElementById('resultCard').classList.add('hidden');
+    ['progressCard','previewCard','analysisCard','resultCard'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
     resetSteps();
   }
 }

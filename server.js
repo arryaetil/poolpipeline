@@ -15,9 +15,10 @@ import { generateVideo } from './pipeline/video.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
+const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';
 const SKIP_VIDEO = process.env.SKIP_VIDEO !== 'false';
 
 const features = loadFeatures();
@@ -59,8 +60,8 @@ app.post('/run', async (req, res) => {
     return res.status(400).json({ error: `Unknown feature: ${featureId}` });
   }
 
-  if (!GOOGLE_KEY || !OR_KEY) {
-    return res.status(500).json({ error: 'GOOGLE_KEY and OPENROUTER_KEY must be set in .env' });
+  if (!GOOGLE_KEY || !MAPBOX_TOKEN || !OR_KEY) {
+    return res.status(500).json({ error: 'GOOGLE_KEY, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -80,9 +81,9 @@ app.post('/run', async (req, res) => {
     mkdirSync(outDir, { recursive: true });
 
     currentStep = 'satellite';
-    const satB64 = await fetchSatellite(geo.lat, geo.lng, GOOGLE_KEY);
-    writeFileSync(join(outDir, 'satellite.jpg'), Buffer.from(satB64, 'base64'));
-    emit('step', { step: 'satellite', status: 'done', value: `data:image/jpeg;base64,${satB64}` });
+    const satB64 = await fetchSatellite(geo.lat, geo.lng, MAPBOX_TOKEN);
+    writeFileSync(join(outDir, 'satellite.png'), Buffer.from(satB64, 'base64'));
+    emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
     currentStep = 'analysis';
     const analysis = await analyse(satB64, feature, OR_KEY);
@@ -95,7 +96,7 @@ app.post('/run', async (req, res) => {
       lng: geo.lng,
       pitch: feature.camera_pitch,
       range: feature.camera_range,
-      googleKey: GOOGLE_KEY,
+      mapboxToken: MAPBOX_TOKEN,
       serverHost: HOST,
       serverPort: PORT,
       onProgress: (heading, b64) => {

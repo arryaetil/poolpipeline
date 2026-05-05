@@ -1,33 +1,25 @@
-import { chromium } from 'playwright';
-
-export async function renderAll({ lat, lng, pitch, range, googleKey, serverHost = '127.0.0.1', serverPort, onProgress }) {
+export async function renderAll({ lat, lng, pitch, range, mapboxToken, onProgress }) {
   const headings = [0, 90, 180, 270];
-  const browser = await chromium.launch({ headless: true });
 
-  try {
-    const results = await Promise.all(headings.map(async (heading) => {
-      const page = await browser.newPage();
-      await page.setViewportSize({ width: 1280, height: 720 });
+  // Cesium pitch (-90=down, 0=horizontal) → Mapbox pitch (0=top-down, 60=max tilt)
+  const mapboxPitch = Math.min(60, Math.max(0, 90 + pitch + 15));
+  // Higher pitch = more perspective stretch = needs more zoom to keep house in frame
+  const zoom = 17.5 + mapboxPitch / 30;
 
-      const url = `http://${serverHost}:${serverPort}/cesium.html` +
-        `?key=${googleKey}&lat=${lat}&lng=${lng}` +
-        `&heading=${heading}&pitch=${pitch}&range=${range}`;
+  const results = await Promise.all(headings.map(async (heading) => {
+    // Cesium heading = orbit position → Mapbox bearing = direction camera faces
+    const bearing = (heading + 180) % 360;
+    const url = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static` +
+      `/${lng},${lat},${zoom.toFixed(2)},${bearing},${mapboxPitch}` +
+      `/1280x720?access_token=${mapboxToken}`;
 
-      await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Render ${heading}° failed: ${res.status}`);
+    const buffer = await res.arrayBuffer();
+    const b64 = Buffer.from(buffer).toString('base64');
+    onProgress(heading, b64);
+    return { heading, image: b64 };
+  }));
 
-      await page.waitForFunction(() => window.__ready === true, { timeout: 30000 })
-        .catch(() => { /* tile timeout — screenshot what we have */ });
-
-      const buf = await page.screenshot({ type: 'png' });
-      await page.close();
-
-      const b64 = buf.toString('base64');
-      onProgress(heading, b64);
-      return { heading, image: b64 };
-    }));
-
-    return results;
-  } finally {
-    await browser.close();
-  }
+  return results;
 }
