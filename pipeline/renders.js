@@ -45,14 +45,6 @@ async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress }) {
 }
 
 export async function renderAll(opts) {
-  if (opts.googleKey) {
-    try {
-      console.log('[renders] using Google 3D Tiles');
-      return await renderGoogle(opts);
-    } catch (err) {
-      console.warn('[renders] Google failed, falling back to Mapbox:', err.message);
-    }
-  }
-  console.log('[renders] using Mapbox Static API');
-  return await renderMapbox(opts);
+  console.log('[renders] using Google 3D Tiles');
+  return await renderGoogle(opts);
 }
