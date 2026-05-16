@@ -42,17 +42,24 @@ export function orHeaders(key) {
   };
 }
 
-export async function orPost(url, key, body) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: orHeaders(key),
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+export async function orPost(url, key, body, timeoutMs = 60000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: orHeaders(key),
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+    }
+    return res.json();
+  } finally {
+    clearTimeout(timer);
   }
-  return res.json();
 }
 
 export function loadFeatures() {

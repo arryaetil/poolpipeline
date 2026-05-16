@@ -2,7 +2,7 @@ import { extractJson, orPost } from './utils.js';
 
 export async function analyse(satB64, feature, orKey, poolCatalog = []) {
   const catalogSection = poolCatalog.length > 0
-    ? `\nAQUAPURA ZWEMBAD CATALOGUS (kies het best passende model voor deze tuin):\n${JSON.stringify(poolCatalog, null, 2)}\n\nKies op basis van de afmetingen en vorm van de achtertuin het meest geschikte zwembadmodel uit bovenstaande catalogus. Geef de "name" terug als recommended_pool en leg je keuze uit in pool_reasoning — schrijf dit in het Nederlands.`
+    ? `\nAQUAPURA ZWEMBAD CATALOGUS:\n${poolCatalog.map(p => `- ${p.name}: ${p.dimensions_m}m — ${p.ideal_garden}`).join('\n')}\n\nKies het meest geschikte model op basis van de achtertuin. Geef de naam terug als recommended_pool en leg je keuze kort uit in pool_reasoning (Nederlands).`
     : '';
 
   const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.
@@ -33,7 +33,7 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
     model: 'anthropic/claude-opus-4',
-    max_tokens: 1500,
+    max_tokens: 2000,
     messages: [{
       role: 'user',
       content: [
