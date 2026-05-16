@@ -2,22 +2,22 @@ import { extractJson, orPost } from './utils.js';
 
 export async function analyse(satB64, feature, orKey, poolCatalog = []) {
   const catalogSection = poolCatalog.length > 0
-    ? `\nAQUAPURA POOL CATALOG (pick the single best fit for this garden):\n${JSON.stringify(poolCatalog, null, 2)}\n\nBased on the backyard dimensions and shape you observe, select the most suitable pool model from the catalog above. Return its "name" field as recommended_pool and explain your reasoning in pool_reasoning.`
+    ? `\nAQUAPURA ZWEMBAD CATALOGUS (kies het best passende model voor deze tuin):\n${JSON.stringify(poolCatalog, null, 2)}\n\nKies op basis van de afmetingen en vorm van de achtertuin het meest geschikte zwembadmodel uit bovenstaande catalogus. Geef de "name" terug als recommended_pool en leg je keuze uit in pool_reasoning — schrijf dit in het Nederlands.`
     : '';
 
   const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.
 
-CRITICAL: The FRONT of the house faces the road/street and contains the driveway. The BACKYARD is the OPPOSITE side — typically enclosed, often with grass, away from the street. Never confuse them.
+BELANGRIJK: De VOORKANT van de woning grenst aan de straat/oprit. De TUIN (achtertuin) bevindt zich aan de TEGENOVERGESTELDE zijde — doorgaans omheind, met gras, weg van de straat. Verwar ze nooit.
 
-1. Identify which compass side of the house is the FRONT (street/driveway side).
-2. Identify the BACKYARD (opposite side from the front).
-3. Identify obstructions in the backyard (trees, sheds, AC units, slopes, patios, existing structures).
+1. Identificeer aan welke kompaszijde de VOORKANT van de woning ligt (straat/oprit).
+2. Identificeer de ACHTERTUIN (tegenover de voorkant).
+3. Identificeer obstakels in de achtertuin (bomen, tuinhuisjes, airco-units, hellingen, terrassen, bestaande constructies).
 4. ${feature.analysis_hint}
-5. Describe the feature position relative to the house using clear directional language.
-6. Determine the compass direction FROM the center of the house TOWARD the backyard (0–360°, 0=N, 90=E, 180=S, 270=W).
+5. Beschrijf de positie van het element ten opzichte van de woning in duidelijke richtingaanduidingen.
+6. Bepaal de kompasrichting VAN het midden van de woning NAAR de achtertuin (0–360°, 0=N, 90=O, 180=Z, 270=W).
 ${catalogSection}
 
-Respond in JSON only:
+Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
 {
   "front_side": "...",
   "backyard": "...",
