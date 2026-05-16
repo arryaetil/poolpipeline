@@ -1,18 +1,39 @@
-export async function renderAll({ lat, lng, pitch, range, mapboxToken, onProgress }) {
-  const headings = [0, 90, 180, 270];
+import puppeteer from 'puppeteer';
 
-  // Cesium pitch (-90=down, 0=horizontal) → Mapbox pitch (0=top-down, 60=max tilt)
+const HEADINGS = [0, 90, 180, 270];
+
+async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, serverPort, onProgress }) {
+  const results = await Promise.all(HEADINGS.map(async (heading) => {
+    const browser = await puppeteer.launch({
+      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    });
+    try {
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1280, height: 720 });
+      const url = `http://${serverHost}:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=${heading}&pitch=${pitch}&range=${range}`;
+      await page.goto(url, { waitUntil: 'networkidle0' });
+      await page.waitForFunction(() => window.__ready === true, { timeout: 30000 });
+      const screenshot = await page.screenshot({ encoding: 'base64', fullPage: false });
+      onProgress(heading, screenshot);
+      return { heading, image: screenshot };
+    } finally {
+      await browser.close();
+    }
+  }));
+  return results;
+}
+
+async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress }) {
   const mapboxPitch = Math.min(60, Math.max(0, 90 + pitch + 15));
-  // Higher pitch = more perspective stretch = needs more zoom to keep house in frame
   const zoom = 17.5 + mapboxPitch / 30;
 
-  const results = await Promise.all(headings.map(async (heading) => {
-    // Cesium heading = orbit position → Mapbox bearing = direction camera faces
+  const results = await Promise.all(HEADINGS.map(async (heading) => {
     const bearing = (heading + 180) % 360;
     const url = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static` +
       `/${lng},${lat},${zoom.toFixed(2)},${bearing},${mapboxPitch}` +
       `/1280x720?access_token=${mapboxToken}`;
-
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Render ${heading}° failed: ${res.status}`);
     const buffer = await res.arrayBuffer();
@@ -20,6 +41,18 @@ export async function renderAll({ lat, lng, pitch, range, mapboxToken, onProgres
     onProgress(heading, b64);
     return { heading, image: b64 };
   }));
-
   return results;
+}
+
+export async function renderAll(opts) {
+  if (opts.googleKey) {
+    try {
+      console.log('[renders] using Google 3D Tiles');
+      return await renderGoogle(opts);
+    } catch (err) {
+      console.warn('[renders] Google failed, falling back to Mapbox:', err.message);
+    }
+  }
+  console.log('[renders] using Mapbox Static API');
+  return await renderMapbox(opts);
 }

@@ -104,6 +104,7 @@ app.post('/run', async (req, res) => {
       pitch: feature.camera_pitch,
       range: feature.camera_range,
       mapboxToken: MAPBOX_TOKEN,
+      googleKey: GOOGLE_KEY,
       serverHost: HOST,
       serverPort: PORT,
       onProgress: (heading, b64) => {
