@@ -56,7 +56,11 @@ export async function orPost(url, key, body, timeoutMs = 60000) {
       const text = await res.text();
       throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
     }
-    return res.json();
+    const json = await res.json();
+    if (!json.choices) {
+      throw new Error(`OpenRouter returned no choices: ${JSON.stringify(json).slice(0, 300)}`);
+    }
+    return json;
   } finally {
     clearTimeout(timer);
   }
