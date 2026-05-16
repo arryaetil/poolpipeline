@@ -2,3 +2,5 @@
 node_modules/
 output/
 .superpowers/
+.claude/
+AQUAPURA_CLAUDE_CODE_PROMPT.md

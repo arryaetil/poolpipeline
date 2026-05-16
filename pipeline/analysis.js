@@ -21,6 +21,8 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
 {
   "front_side": "...",
   "backyard": "...",
+  "backyard_width_m": <number>,
+  "backyard_depth_m": <number>,
   "obstructions": "...",
   "recommendation": "...",
   "recommended_pool": "...",

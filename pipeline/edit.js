@@ -1,5 +1,13 @@
 import { orPost } from './utils.js';
 
+function poolScaleHint(analysis) {
+  if (!analysis.pool_dimensions || !analysis.backyard_depth_m || !analysis.backyard_width_m) return '';
+  const [poolLength, poolWidth] = analysis.pool_dimensions.split('×').map((s) => parseFloat(s.trim()));
+  const depthPct = Math.round((poolLength / analysis.backyard_depth_m) * 100);
+  const widthPct = Math.round((poolWidth / analysis.backyard_width_m) * 100);
+  return ` The pool should occupy approximately ${depthPct}% of the visible lawn depth and ${widthPct}% of the lawn width — no larger.`;
+}
+
 export async function editImage(chosenRenderB64, feature, analysis, orKey) {
   const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
 
@@ -10,7 +18,7 @@ HOW TO IDENTIFY THE CORRECT SPOT:
   - The FRONT of the house (driveway, street) is BEHIND the house in the BACKGROUND — often hidden by the house itself.
 - Place the feature ONLY in the foreground area. NEVER between the house and any road visible in the background. NEVER on a neighbor's lot.
 
-${feature.edit_prompt}
+${feature.edit_prompt}${poolScaleHint(analysis)}
 ${analysis.render_prompt}
 
 Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbors, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle.`;
