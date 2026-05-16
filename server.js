@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,6 +22,9 @@ const HOST = process.env.HOST || '0.0.0.0';
 const SKIP_VIDEO = process.env.SKIP_VIDEO !== 'false';
 
 const features = loadFeatures();
+const poolCatalog = JSON.parse(
+  readFileSync(join(__dirname, 'aquapura-pools.json'), 'utf-8')
+);
 const app = express();
 
 app.use(express.json({ limit: '2mb' }));
@@ -86,7 +89,7 @@ app.post('/run', async (req, res) => {
     emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
     currentStep = 'analysis';
-    const analysis = await analyse(satB64, feature, OR_KEY);
+    const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : []);
     writeFileSync(join(outDir, 'analysis.json'), JSON.stringify(analysis, null, 2));
     emit('step', { step: 'analysis', status: 'done', value: analysis });
 

@@ -520,8 +520,13 @@ function showLivePreview(src, label) {
 
 function showAnalysis(analysis) {
   const body = document.getElementById('analysisBody');
+  const poolModelRow = analysis.recommended_pool
+    ? `<div><div class="af-label" style="color:#4ecdc4;">Aquapura model</div><div class="af-value" style="font-weight:700;font-size:18px;color:#fff;">${escHtml(analysis.recommended_pool)}</div></div>
+       <div><div class="af-label" style="color:#4ecdc4;">Reden keuze</div><div class="af-value">${escHtml(analysis.pool_reasoning ?? '—')}</div></div>`
+    : '';
   body.innerHTML = `
     <div class="analysis-fields">
+      ${poolModelRow}
       <div><div class="af-label">Achterkant perceel</div><div class="af-value">${escHtml(analysis.backyard ?? '—')}</div></div>
       <div><div class="af-label">Obstakels</div><div class="af-value">${escHtml(analysis.obstructions ?? '—')}</div></div>
       <div><div class="af-label">Aanbeveling</div><div class="af-value">${escHtml(analysis.recommendation ?? '—')}</div></div>
