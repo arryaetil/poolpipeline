@@ -1,6 +1,9 @@
 import puppeteer from 'puppeteer';
 
-const HEADINGS = [0, 90, 180, 270];
+function getHeadings(backyardHeading) {
+  if (backyardHeading == null) return [0, 90, 180, 270];
+  return [-45, 0, 45].map(offset => ((backyardHeading + offset) % 360 + 360) % 360);
+}
 
 function launchBrowser() {
   return puppeteer.launch({
@@ -18,11 +21,11 @@ function launchBrowser() {
   });
 }
 
-async function renderGoogle({ lat, lng, pitch, range, ionToken, serverHost, serverPort, onProgress }) {
+async function renderGoogle({ lat, lng, pitch, range, ionToken, serverHost, serverPort, onProgress, backyardHeading }) {
   const browser = await launchBrowser();
 
   try {
-    const results = await Promise.all(HEADINGS.map(async (heading) => {
+    const results = await Promise.all(getHeadings(backyardHeading).map(async (heading) => {
       const page = await browser.newPage();
       await page.setViewport({ width: 1280, height: 720 });
 
@@ -47,11 +50,11 @@ async function renderGoogle({ lat, lng, pitch, range, ionToken, serverHost, serv
   }
 }
 
-export async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress }) {
+export async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress, backyardHeading }) {
   const mapboxPitch = Math.min(60, Math.max(0, 90 + pitch + 15));
   const zoom = 17.5 + mapboxPitch / 30;
 
-  const results = await Promise.all(HEADINGS.map(async (heading) => {
+  const results = await Promise.all(getHeadings(backyardHeading).map(async (heading) => {
     const bearing = (heading + 180) % 360;
     const url = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static` +
       `/${lng},${lat},${zoom.toFixed(2)},${bearing},${mapboxPitch}` +

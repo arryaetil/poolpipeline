@@ -9,7 +9,7 @@ import { geocode } from './pipeline/geocode.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
-import { fetchParcel, fetchBuilding, annotateImage } from './pipeline/parcel.js';
+import { fetchParcel, fetchBuilding, annotateImage, gardenCentroid } from './pipeline/parcel.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
@@ -152,10 +152,11 @@ app.post('/run', async (req, res) => {
       satForAnalysis = await annotateImage(satB64, parcel, building, geo.lat, geo.lng);
       writeFileSync(join(outDir, 'satellite-annotated.png'), Buffer.from(satForAnalysis, 'base64'));
       emit('step', { step: 'satellite', status: 'annotated', value: `data:image/png;base64,${satForAnalysis}` });
-      renderLat = parcel.centroid.lat;
-      renderLng = parcel.centroid.lng;
+      const target = building ? gardenCentroid(parcel.coords, building) : parcel.centroid;
+      renderLat = target.lat;
+      renderLng = target.lng;
       renderRange = parcel.range;
-      console.log(`[parcel] ${parcel.width_m}m × ${parcel.depth_m}m → centroid ${renderLat.toFixed(6)},${renderLng.toFixed(6)} range=${renderRange}m`);
+      console.log(`[parcel] ${parcel.width_m}m × ${parcel.depth_m}m → target ${renderLat.toFixed(6)},${renderLng.toFixed(6)} range=${renderRange}m${building ? ' (garden centroid)' : ' (parcel centroid)'}`);
     } catch (err) {
       console.warn('[parcel] lookup failed, using geocoded point:', err.message);
     }
@@ -193,6 +194,7 @@ app.post('/run', async (req, res) => {
       lng: renderLng,
       pitch: feature.camera_pitch,
       range: renderRange,
+      backyardHeading: analysis.backyard_camera_heading ?? null,
       mapboxToken: MAPBOX_TOKEN,
       ionToken: CESIUM_ION_TOKEN,
       serverHost: '127.0.0.1',

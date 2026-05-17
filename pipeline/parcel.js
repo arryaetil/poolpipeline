@@ -47,7 +47,7 @@ function polygonCentroid(coords) {
 
 function parcelToRange(width_m, depth_m) {
   const longest = Math.max(width_m, depth_m);
-  return Math.round(Math.max(60, Math.min(250, longest * 4)));
+  return Math.round(Math.max(60, Math.min(150, longest * 2)));
 }
 
 function buildParcelResult(coords) {
@@ -55,6 +55,16 @@ function buildParcelResult(coords) {
   const centroid = polygonCentroid(coords);
   const range = parcelToRange(dims.width_m, dims.depth_m);
   return { coords, ...dims, centroid, range };
+}
+
+// Shifts parcel centroid away from building centroid into the garden
+export function gardenCentroid(parcelCoords, buildingCoords) {
+  const pc = polygonCentroid(parcelCoords);
+  const bc = polygonCentroid(buildingCoords);
+  return {
+    lat: pc.lat + (pc.lat - bc.lat) * 0.5,
+    lng: pc.lng + (pc.lng - bc.lng) * 0.5,
+  };
 }
 
 // ── Netherlands ───────────────────────────────────────────────────
