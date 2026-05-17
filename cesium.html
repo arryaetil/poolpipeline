@@ -70,7 +70,7 @@
   // Wait until tiles stop streaming, or 30s max. Use setInterval — rAF stalls in headless Chrome.
   let stable = 0;
   await new Promise(resolve => {
-    const tid = setTimeout(resolve, 30000);
+    const tid = setTimeout(resolve, 300000);
     const iv = setInterval(() => {
       viewer.render();
       stable = tileset.tilesLoaded ? stable + 1 : 0;
