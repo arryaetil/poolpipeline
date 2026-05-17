@@ -47,7 +47,7 @@ function polygonCentroid(coords) {
 
 function parcelToRange(width_m, depth_m) {
   const longest = Math.max(width_m, depth_m);
-  return Math.round(Math.max(60, Math.min(150, longest * 2)));
+  return Math.round(Math.max(50, Math.min(200, longest * 3)));
 }
 
 function buildParcelResult(coords) {
