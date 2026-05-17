@@ -6,7 +6,14 @@ function launchBrowser() {
   return puppeteer.launch({
     headless: true,
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--use-gl=swiftshader',
+      '--enable-webgl',
+      '--ignore-gpu-blocklist',
+    ],
   });
 }
 
@@ -24,9 +31,9 @@ async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, ser
 
       const url = `http://${serverHost}:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=${heading}&pitch=${pitch}&range=${range}`;
       console.log(`[renders] heading ${heading}: navigating to cesium.html`);
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 35000 });
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
       console.log(`[renders] heading ${heading}: page loaded, waiting for __ready`);
-      await page.waitForFunction(() => window.__ready === true, { timeout: 30000 });
+      await page.waitForFunction(() => window.__ready === true, { timeout: 60000 });
       console.log(`[renders] heading ${heading}: __ready, taking screenshot`);
       const screenshot = await page.screenshot({ encoding: 'base64', fullPage: false });
       await page.close();
@@ -77,11 +84,11 @@ export async function renderGoogleDiagnostic({ lat, lng, pitch, range, googleKey
     const url = `http://127.0.0.1:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=180&pitch=${pitch}&range=${range}`;
 
     const stopGoto = mark('goto_ms');
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 35000 });
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
     stopGoto();
 
     const stopReady = mark('ready_ms');
-    await page.waitForFunction(() => window.__ready === true, { timeout: 30000 });
+    await page.waitForFunction(() => window.__ready === true, { timeout: 60000 });
     stopReady();
 
     const stopShot = mark('screenshot_ms');
