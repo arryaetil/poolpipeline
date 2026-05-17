@@ -18,7 +18,7 @@ function launchBrowser() {
   });
 }
 
-async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, serverPort, onProgress }) {
+async function renderGoogle({ lat, lng, pitch, range, ionToken, serverHost, serverPort, onProgress }) {
   const browser = await launchBrowser();
 
   try {
@@ -30,7 +30,7 @@ async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, ser
       page.on('pageerror', (err) => console.error(`[cesium:${heading}] pageerror:`, err.message));
       page.on('requestfailed', (req) => console.warn(`[cesium:${heading}] requestfailed: ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
 
-      const url = `http://${serverHost}:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=${heading}&pitch=${pitch}&range=${range}`;
+      const url = `http://${serverHost}:${serverPort}/cesium.html?ionToken=${ionToken}&lat=${lat}&lng=${lng}&heading=${heading}&pitch=${pitch}&range=${range}`;
       console.log(`[renders] heading ${heading}: navigating to cesium.html`);
       await page.goto(url, { waitUntil: 'load', timeout: 60000 });
       console.log(`[renders] heading ${heading}: page loaded, waiting for __ready`);
@@ -66,7 +66,7 @@ export async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress })
   return results;
 }
 
-export async function renderGoogleDiagnostic({ lat, lng, pitch, range, googleKey, serverPort }) {
+export async function renderGoogleDiagnostic({ lat, lng, pitch, range, ionToken, serverPort }) {
   const timings = {};
   const pageConsole = [];
   const pageErrors = [];
@@ -82,7 +82,7 @@ export async function renderGoogleDiagnostic({ lat, lng, pitch, range, googleKey
     page.on('console', (msg) => pageConsole.push(`[${msg.type()}] ${msg.text()}`));
     page.on('pageerror', (err) => pageErrors.push(err.message));
 
-    const url = `http://127.0.0.1:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=180&pitch=${pitch}&range=${range}`;
+    const url = `http://127.0.0.1:${serverPort}/cesium.html?ionToken=${ionToken}&lat=${lat}&lng=${lng}&heading=180&pitch=${pitch}&range=${range}`;
 
     const stopGoto = mark('goto_ms');
     await page.goto(url, { waitUntil: 'load', timeout: 60000 });

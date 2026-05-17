@@ -14,14 +14,13 @@
 <script>
 (async () => {
   const p = new URLSearchParams(location.search);
-  const key     = p.get('key');
   const lat     = parseFloat(p.get('lat'));
   const lng     = parseFloat(p.get('lng'));
   const heading = parseFloat(p.get('heading'));
   const pitch   = parseFloat(p.get('pitch'));
   const range   = parseFloat(p.get('range'));
 
-  Cesium.Ion.defaultAccessToken = '';
+  Cesium.Ion.defaultAccessToken = p.get('ionToken');
 
   const viewer = new Cesium.Viewer('c', {
     animation: false,
@@ -40,10 +39,9 @@
 
   viewer.scene.globe.show = false;
 
-  const tileset = await Cesium.Cesium3DTileset.fromUrl(
-    `https://tile.googleapis.com/v1/3dtiles/root.json?key=${key}`
+  const tileset = viewer.scene.primitives.add(
+    await Cesium.Cesium3DTileset.fromIonAssetId(2275207),
   );
-  viewer.scene.primitives.add(tileset);
 
   let targetHeight = 80;
   try {

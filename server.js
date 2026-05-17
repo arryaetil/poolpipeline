@@ -14,7 +14,7 @@ import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const GOOGLE_KEY = process.env.GOOGLE_KEY;
+const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
@@ -60,19 +60,19 @@ app.get('/test-renders', async (req, res) => {
     env: {
       PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH ?? 'not set',
       PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD ?? 'not set',
-      GOOGLE_KEY: GOOGLE_KEY ? 'set' : 'NOT SET',
+      CESIUM_ION_TOKEN: CESIUM_ION_TOKEN ? 'set' : 'NOT SET',
       MAPBOX_TOKEN: MAPBOX_TOKEN ? 'set' : 'NOT SET',
     },
   };
 
-  if (!GOOGLE_KEY) {
-    return res.json({ ...diag, error: 'GOOGLE_KEY not set — cannot test Google renders' });
+  if (!CESIUM_ION_TOKEN) {
+    return res.json({ ...diag, error: 'CESIUM_ION_TOKEN not set — cannot test Cesium Ion renders' });
   }
 
   try {
     const googleResult = await renderGoogleDiagnostic({
       lat, lng, pitch: -50, range: 130,
-      googleKey: GOOGLE_KEY,
+      ionToken: CESIUM_ION_TOKEN,
       serverPort: PORT,
     });
     return res.json({ ...diag, provider: 'google', ...googleResult });
@@ -112,8 +112,8 @@ app.post('/run', async (req, res) => {
     return res.status(400).json({ error: `Unknown feature: ${featureId}` });
   }
 
-  if (!GOOGLE_KEY || !MAPBOX_TOKEN || !OR_KEY) {
-    return res.status(500).json({ error: 'GOOGLE_KEY, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
+  if (!CESIUM_ION_TOKEN || !MAPBOX_TOKEN || !OR_KEY) {
+    return res.status(500).json({ error: 'CESIUM_ION_TOKEN, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -153,7 +153,7 @@ app.post('/run', async (req, res) => {
       pitch: feature.camera_pitch,
       range: feature.camera_range,
       mapboxToken: MAPBOX_TOKEN,
-      googleKey: GOOGLE_KEY,
+      ionToken: CESIUM_ION_TOKEN,
       serverHost: '127.0.0.1',
       serverPort: PORT,
       onProgress: (heading, b64) => {
