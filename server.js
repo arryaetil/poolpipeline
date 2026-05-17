@@ -15,6 +15,7 @@ import { generateVideo } from './pipeline/video.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
+const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
@@ -112,8 +113,8 @@ app.post('/run', async (req, res) => {
     return res.status(400).json({ error: `Unknown feature: ${featureId}` });
   }
 
-  if (!CESIUM_ION_TOKEN || !MAPBOX_TOKEN || !OR_KEY) {
-    return res.status(500).json({ error: 'CESIUM_ION_TOKEN, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
+  if (!CESIUM_ION_TOKEN || !GOOGLE_KEY || !MAPBOX_TOKEN || !OR_KEY) {
+    return res.status(500).json({ error: 'CESIUM_ION_TOKEN, GOOGLE_KEY, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
