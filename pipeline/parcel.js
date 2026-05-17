@@ -45,15 +45,21 @@ function polygonCentroid(coords) {
   };
 }
 
-// Camera range based on parcel size: show the parcel + surrounding context
 function parcelToRange(width_m, depth_m) {
   const longest = Math.max(width_m, depth_m);
   return Math.round(Math.max(60, Math.min(250, longest * 4)));
 }
 
-// ── API fetchers ──────────────────────────────────────────────────
+function buildParcelResult(coords) {
+  const dims = polygonDimensions(coords);
+  const centroid = polygonCentroid(coords);
+  const range = parcelToRange(dims.width_m, dims.depth_m);
+  return { coords, ...dims, centroid, range };
+}
 
-export async function fetchParcel(lat, lng) {
+// ── Netherlands ───────────────────────────────────────────────────
+
+async function fetchParcelNetherlands(lat, lng) {
   const delta = 0.001;
   const url = `https://service.pdok.nl/kadaster/kadastralekaart/wfs/v5_0` +
     `?service=WFS&version=2.0.0&request=GetFeature` +
@@ -68,25 +74,99 @@ export async function fetchParcel(lat, lng) {
     const coords = f.geometry?.coordinates?.[0];
     return coords && pointInPolygon([lng, lat], coords);
   });
-
   if (!feature) throw new Error('No parcel found at this location');
 
-  const coords = feature.geometry.coordinates[0];
-  const dims = polygonDimensions(coords);
-  const centroid = polygonCentroid(coords);
-  const range = parcelToRange(dims.width_m, dims.depth_m);
-  return { coords, ...dims, centroid, range };
+  console.log('[parcel] Netherlands: PDOK parcel found');
+  return buildParcelResult(feature.geometry.coordinates[0]);
 }
 
-export async function fetchBuilding(lat, lng, bagKey) {
+async function fetchBuildingNetherlands(lat, lng, bagKey) {
   if (!bagKey) return null;
   const url = `https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/panden?lat=${lat}&lon=${lng}&radius=10`;
   const res = await fetch(url, { headers: { 'X-Api-Key': bagKey } });
   if (!res.ok) return null;
   const data = await res.json();
   const pand = data._embedded?.panden?.[0];
-  if (!pand?.geometrie?.coordinates?.[0]) return null;
-  return pand.geometrie.coordinates[0];
+  return pand?.geometrie?.coordinates?.[0] ?? null;
+}
+
+// ── Belgium ───────────────────────────────────────────────────────
+
+async function fetchParcelBelgium(lat, lng) {
+  const delta = 0.001;
+
+  // Try GRB (Flanders) first
+  try {
+    const url = `https://geo.api.vlaanderen.be/GRB/wfs?service=WFS&version=2.0.0&request=GetFeature` +
+      `&typeName=GRB:ADP&outputFormat=application/json&srsName=EPSG:4326` +
+      `&bbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`GRB failed: ${res.status}`);
+    const data = await res.json();
+    const feature = data.features?.find(f => {
+      const coords = f.geometry?.coordinates?.[0];
+      return coords && pointInPolygon([lng, lat], coords);
+    });
+    if (feature) {
+      console.log('[parcel] Belgium: GRB parcel found');
+      return buildParcelResult(feature.geometry.coordinates[0]);
+    }
+  } catch (err) {
+    console.warn('[parcel] GRB failed, trying CadGIS:', err.message);
+  }
+
+  // Fall back to CadGIS (all of Belgium)
+  const url = `https://ccff02.minfin.fgov.be/geoservices/arcgis/rest/services/public/Cadastral_Boundaries/MapServer/WFSServer` +
+    `?service=WFS&version=2.0.0&request=GetFeature` +
+    `&typeName=Cadastral_Boundaries:CadastralParcel` +
+    `&outputFormat=application/json&srsName=EPSG:4326` +
+    `&bbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`CadGIS failed: ${res.status}`);
+  const data = await res.json();
+  const feature = data.features?.find(f => {
+    const coords = f.geometry?.coordinates?.[0];
+    return coords && pointInPolygon([lng, lat], coords);
+  });
+  if (!feature) throw new Error('No parcel found at this Belgian location');
+
+  console.log('[parcel] Belgium: CadGIS parcel found');
+  return buildParcelResult(feature.geometry.coordinates[0]);
+}
+
+async function fetchBuildingBelgium(lat, lng) {
+  try {
+    const delta = 0.001;
+    const url = `https://geo.api.vlaanderen.be/GRB/wfs?service=WFS&version=2.0.0&request=GetFeature` +
+      `&typeName=GRB:GBG&outputFormat=application/json&srsName=EPSG:4326` +
+      `&bbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const feature = data.features?.find(f => {
+      const coords = f.geometry?.coordinates?.[0];
+      return coords && pointInPolygon([lng, lat], coords);
+    });
+    return feature?.geometry?.coordinates?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Public API ────────────────────────────────────────────────────
+
+export async function fetchParcel(lat, lng, country = 'Nederland') {
+  if (country === 'België' || country === 'Belgium') {
+    return fetchParcelBelgium(lat, lng);
+  }
+  return fetchParcelNetherlands(lat, lng);
+}
+
+export async function fetchBuilding(lat, lng, bagKey, country = 'Nederland') {
+  if (country === 'België' || country === 'Belgium') {
+    return fetchBuildingBelgium(lat, lng);
+  }
+  return fetchBuildingNetherlands(lat, lng, bagKey);
 }
 
 // ── Image annotation ──────────────────────────────────────────────

@@ -140,15 +140,15 @@ app.post('/run', async (req, res) => {
     writeFileSync(join(outDir, 'satellite.png'), Buffer.from(satB64, 'base64'));
     emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
-    // Parcel + building lookup (Dutch addresses only — degrades gracefully)
+    // Parcel + building lookup (NL + BE — degrades gracefully for other countries)
     let parcel = null;
     let renderLat = geo.lat;
     let renderLng = geo.lng;
     let renderRange = feature.camera_range;
     let satForAnalysis = satB64;
     try {
-      parcel = await fetchParcel(geo.lat, geo.lng);
-      const building = await fetchBuilding(geo.lat, geo.lng, BAG_KEY);
+      parcel = await fetchParcel(geo.lat, geo.lng, geo.country);
+      const building = await fetchBuilding(geo.lat, geo.lng, BAG_KEY, geo.country);
       satForAnalysis = await annotateImage(satB64, parcel, building, geo.lat, geo.lng);
       writeFileSync(join(outDir, 'satellite-annotated.png'), Buffer.from(satForAnalysis, 'base64'));
       emit('step', { step: 'satellite', status: 'annotated', value: `data:image/png;base64,${satForAnalysis}` });
