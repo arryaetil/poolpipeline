@@ -131,6 +131,21 @@ body {
 .gen-btn:active { transform: translateY(0); opacity: 0.85; }
 .gen-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
+.render-toggle { display: flex; gap: 10px; justify-content: center; }
+.rtoggle-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 12px 0; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.40); font-family: inherit; cursor: pointer;
+  transition: all 0.22s ease;
+}
+.rtoggle-btn i { width: 15px; height: 15px; }
+.rtoggle-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
+.rtoggle-btn.active {
+  background: rgba(184,148,63,0.11); border-color: rgba(184,148,63,0.45);
+  color: #d4a848; box-shadow: 0 0 24px rgba(184,148,63,0.12), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
 /* Progress card */
 .progress-card { padding: 28px 28px; }
 .steps { display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -330,6 +345,17 @@ body {
       <span class="sect-label">Kies een product</span>
       <div class="feat-grid" id="featGrid"></div>
     </div>
+    <div class="feat-section" style="margin-bottom:28px;">
+      <span class="sect-label">Render stijl</span>
+      <div class="render-toggle">
+        <button class="rtoggle-btn active" id="rtoggle-3d" type="button" data-mode="3d">
+          <i data-lucide="box"></i>3D
+        </button>
+        <button class="rtoggle-btn" id="rtoggle-2d" type="button" data-mode="2d">
+          <i data-lucide="map"></i>2D
+        </button>
+      </div>
+    </div>
     <button class="gen-btn" id="genBtn" type="button">
       <i data-lucide="arrow-right"></i>
       Genereer visualisatie
@@ -444,6 +470,7 @@ body {
 // State
 let featureList = [];
 let selectedFeatureId = null;
+let selectedRenderMode = '3d';
 let rendersCount = 0;
 let chosenRenderSrc = null;
 let editedSrc = null;
@@ -476,6 +503,12 @@ async function loadFeatures() {
 function selectFeature(id) {
   selectedFeatureId = id;
   document.querySelectorAll('.feat-card').forEach((c) => c.classList.toggle('active', c.dataset.id === id));
+}
+
+function selectRenderMode(mode) {
+  selectedRenderMode = mode;
+  document.querySelectorAll('.rtoggle-btn').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
+  lucide.createIcons({ nodes: document.querySelectorAll('.rtoggle-btn') });
 }
 
 // Progress steps
@@ -593,7 +626,7 @@ async function run() {
     const res = await fetch('/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address, feature: selectedFeatureId }),
+      body: JSON.stringify({ address, feature: selectedFeatureId, renderMode: selectedRenderMode }),
     });
     if (!res.ok) { const err = await res.json(); throw new Error(err.error || `Fout ${res.status}`); }
 
@@ -695,6 +728,7 @@ document.getElementById('genBtn').addEventListener('click', run);
 document.getElementById('btnDownload').addEventListener('click', download);
 document.getElementById('btnReset').addEventListener('click', reset);
 document.getElementById('addrInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
+document.querySelectorAll('.rtoggle-btn').forEach((b) => b.addEventListener('click', () => selectRenderMode(b.dataset.mode)));
 
 // Init
 initSlider();

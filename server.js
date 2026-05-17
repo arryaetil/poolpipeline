@@ -103,7 +103,7 @@ app.get('/test-renders', async (req, res) => {
 });
 
 app.post('/run', async (req, res) => {
-  const { address, feature: featureId } = req.body ?? {};
+  const { address, feature: featureId, renderMode = '3d' } = req.body ?? {};
   if (!address || !featureId) {
     return res.status(400).json({ error: 'address and feature are required' });
   }
@@ -148,7 +148,8 @@ app.post('/run', async (req, res) => {
     emit('step', { step: 'analysis', status: 'done', value: analysis });
 
     currentStep = 'renders';
-    const renders = await renderAll({
+    const renderFn = renderMode === '2d' ? renderMapbox : renderAll;
+    const renders = await renderFn({
       lat: geo.lat,
       lng: geo.lng,
       pitch: feature.camera_pitch,
