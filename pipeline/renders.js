@@ -17,9 +17,17 @@ async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, ser
     const results = await Promise.all(HEADINGS.map(async (heading) => {
       const page = await browser.newPage();
       await page.setViewport({ width: 1280, height: 720 });
+
+      page.on('console', (msg) => console.log(`[cesium:${heading}] ${msg.type()}: ${msg.text()}`));
+      page.on('pageerror', (err) => console.error(`[cesium:${heading}] pageerror:`, err.message));
+      page.on('requestfailed', (req) => console.warn(`[cesium:${heading}] requestfailed: ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
+
       const url = `http://${serverHost}:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=${heading}&pitch=${pitch}&range=${range}`;
+      console.log(`[renders] heading ${heading}: navigating to cesium.html`);
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 35000 });
+      console.log(`[renders] heading ${heading}: page loaded, waiting for __ready`);
       await page.waitForFunction(() => window.__ready === true, { timeout: 30000 });
+      console.log(`[renders] heading ${heading}: __ready, taking screenshot`);
       const screenshot = await page.screenshot({ encoding: 'base64', fullPage: false });
       await page.close();
       onProgress(heading, screenshot);

@@ -5,6 +5,8 @@ import { extractJson, orPost } from '../pipeline/utils.js';
 
 const FAKE_AB = new ArrayBuffer(10);
 
+const HEADINGS = [0, 90, 180, 270];
+
 const MAPBOX_OPTS = {
   lat: 51.05,
   lng: 3.72,
@@ -27,34 +29,29 @@ test('renderMapbox returns 4 results with correct headings', async (t) => {
   results.forEach((r) => assert.ok(r.image.length > 0));
 });
 
-// Test 2 — renderAll uses Mapbox when googleKey is absent
-test('renderAll uses Mapbox when googleKey is not provided', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => ({
-    ok: true,
-    arrayBuffer: async () => FAKE_AB,
-  }));
+// Test 2 — renderAll uses the Google render function
+test('renderAll uses Google render function', async () => {
+  let called = false;
+  const fakeGoogle = async () => {
+    called = true;
+    return HEADINGS.map((heading) => ({ heading, image: 'fake' }));
+  };
 
-  const results = await renderAll({ ...MAPBOX_OPTS });
+  const results = await renderAll({ ...MAPBOX_OPTS, _googleRender: fakeGoogle });
 
+  assert.ok(called, 'Google render function should be called');
   assert.equal(results.length, 4);
-  assert.deepEqual(results.map((r) => r.heading), [0, 90, 180, 270]);
 });
 
-// Test 3 — renderAll falls back to Mapbox when Google throws
-test('renderAll falls back to Mapbox when Google throws', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => ({
-    ok: true,
-    arrayBuffer: async () => FAKE_AB,
-  }));
-
-  const results = await renderAll({
-    ...MAPBOX_OPTS,
-    googleKey: 'fake-google-key',
-    _googleRender: async () => { throw new Error('Puppeteer failed'); },
-  });
-
-  assert.equal(results.length, 4);
-  assert.deepEqual(results.map((r) => r.heading), [0, 90, 180, 270]);
+// Test 3 — renderAll propagates error when Google throws (no silent fallback)
+test('renderAll propagates error when Google throws', async () => {
+  await assert.rejects(
+    () => renderAll({
+      ...MAPBOX_OPTS,
+      _googleRender: async () => { throw new Error('Puppeteer failed'); },
+    }),
+    /Puppeteer failed/,
+  );
 });
 
 // Test 4 — extractJson parses clean JSON
