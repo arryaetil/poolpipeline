@@ -5,7 +5,7 @@ const HEADINGS = [0, 90, 180, 270];
 function launchBrowser() {
   return puppeteer.launch({
     headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, // set on Railway if using system Chromium
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
