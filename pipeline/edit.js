@@ -31,6 +31,7 @@ STRICT RULES — do not break these:
 - Do NOT modify the house, roof, walls, windows, or driveway.
 - Do NOT modify neighboring properties in any way.
 - Do NOT change the framing, zoom level, or camera angle.
+- Do NOT change the color, brightness, or texture of any grass or lawn — the grass outside the terrace must be pixel-perfect identical to the original.
 - Keep every pixel outside the pool and terrace area identical to the original.
 - This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
 
