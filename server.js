@@ -144,7 +144,21 @@ app.post('/run', async (req, res) => {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
       if (matched) {
         analysis.pool_dimensions = matched.dimensions_m;
-        analysis.pool_terrace_style = matched.terrace_style;
+        // Build terrace style from analysis material choice + model furniture
+        const materialMap = {
+          'arduin':             'dark grey Belgian arduin (bluestone) slabs',
+          'composiet':          'grey-brown composite wood-look decking boards',
+          'tropisch hardhout':  'warm natural ipé tropical hardwood deck',
+          'keramische tegels':  'large light grey ceramic tiles',
+        };
+        const material = materialMap[analysis.terrace_material] || materialMap['arduin'];
+        const furniture = matched.terrace_style.includes('sunlounger')
+          ? matched.terrace_style.split(',').filter(s => s.includes('lounger')).join(',').trim()
+          : '2 white minimal sunloungers';
+        const covrex = matched.id.startsWith('la_plage') || ['zenn','city','city_plus','style','carre','xl','xl_plus'].includes(matched.id)
+          ? ' An anthracite Covrex rolluik (automatic pool cover) sits partially retracted at one short end of the pool.'
+          : '';
+        analysis.pool_terrace_style = `${material} surrounding the pool flush with the coping. ${furniture}.${covrex}`;
       }
     }
     writeFileSync(join(outDir, 'analysis.json'), JSON.stringify(analysis, null, 2));

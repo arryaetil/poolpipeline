@@ -21,7 +21,7 @@ HOW TO IDENTIFY THE CORRECT SPOT:
 ${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}
 ${analysis.render_prompt}
 
-Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbors, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle.`;
+Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbors, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle. This may be either a photorealistic 3D render or a 2D satellite image — adapt your rendering style to match whichever it is.`;
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
     model: 'google/gemini-3-pro-image-preview',
