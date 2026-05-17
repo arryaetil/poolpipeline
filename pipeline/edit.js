@@ -8,20 +8,31 @@ function poolScaleHint(analysis) {
   return ` The pool should occupy approximately ${depthPct}% of the visible lawn depth and ${widthPct}% of the lawn width — no larger.`;
 }
 
-export async function editImage(chosenRenderB64, feature, analysis, orKey) {
+export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
+  const countryLabel = country === 'België' || country === 'Belgium' ? 'Belgian' : country === 'Nederland' ? 'Dutch' : '';
+  const positionBlock = analysis.recommendation
+    ? `\nPOOL POSITION: ${analysis.recommendation}\n`
+    : '';
+
   const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
 
-HOW TO IDENTIFY THE CORRECT SPOT:
-- The target house is the one closest to the center of the frame.
-- This photo was taken from a drone hovering OVER THE BACKYARD, looking across the backyard toward the house. Therefore:
-  - The BACKYARD is the grass/lawn area in the FOREGROUND (between the bottom edge and the target house).
-  - The FRONT of the house (driveway, street) is BEHIND the house in the BACKGROUND — often hidden by the house itself.
-- Place the feature ONLY in the foreground area. NEVER between the house and any road visible in the background. NEVER on a neighbor's lot.
-
+TARGET HOUSE IDENTIFICATION — CRITICAL:
+- The camera is aimed directly at the TARGET garden — it occupies the CENTER of this image.
+- The TARGET HOUSE is the house immediately behind that central garden area.
+- DO NOT touch, modify, or add anything to any neighboring house or garden visible in the image.
+- If you are unsure which garden is the target, use the garden closest to the exact center of the image.
+${positionBlock}
 ${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}
 ${analysis.render_prompt}
 
-Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbors, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle. This may be either a photorealistic 3D render or a 2D satellite image — adapt your rendering style to match whichever it is.`;
+STRICT RULES — do not break these:
+- Add ONLY the swimming pool and its immediate terrace. Nothing else.
+- Do NOT add trees, plants, shrubs, or any vegetation anywhere in the image.
+- Do NOT modify the house, roof, walls, windows, or driveway.
+- Do NOT modify neighboring properties in any way.
+- Do NOT change the framing, zoom level, or camera angle.
+- Keep every pixel outside the pool and terrace area identical to the original.
+- This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
     model: 'google/gemini-3-pro-image-preview',

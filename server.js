@@ -217,7 +217,7 @@ app.post('/run', async (req, res) => {
     const chosenRender = renders.find((item) => item.heading === viewResult.chosen_heading) ?? renders[0];
 
     currentStep = 'edit';
-    const editedB64 = await editImage(chosenRender.image, feature, analysis, OR_KEY);
+    const editedB64 = await editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country);
     writeFileSync(join(outDir, 'edited.png'), Buffer.from(editedB64, 'base64'));
     emit('step', { step: 'edit', status: 'done', value: `data:image/png;base64,${editedB64}` });
 
