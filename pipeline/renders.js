@@ -2,12 +2,16 @@ import puppeteer from 'puppeteer';
 
 const HEADINGS = [0, 90, 180, 270];
 
-async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, serverPort, onProgress }) {
-  const browser = await puppeteer.launch({
+function launchBrowser() {
+  return puppeteer.launch({
     headless: true,
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
+}
+
+async function renderGoogle({ lat, lng, pitch, range, googleKey, serverHost, serverPort, onProgress }) {
+  const browser = await launchBrowser();
 
   try {
     const results = await Promise.all(HEADINGS.map(async (heading) => {
@@ -44,6 +48,43 @@ export async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress })
     return { heading, image: b64 };
   }));
   return results;
+}
+
+export async function renderGoogleDiagnostic({ lat, lng, pitch, range, googleKey, serverPort }) {
+  const timings = {};
+  const pageConsole = [];
+  const pageErrors = [];
+  const mark = (label) => { const s = Date.now(); return () => { timings[label] = Date.now() - s; }; };
+
+  const stopLaunch = mark('launch_ms');
+  const browser = await launchBrowser();
+  stopLaunch();
+
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 720 });
+    page.on('console', (msg) => pageConsole.push(`[${msg.type()}] ${msg.text()}`));
+    page.on('pageerror', (err) => pageErrors.push(err.message));
+
+    const url = `http://127.0.0.1:${serverPort}/cesium.html?key=${googleKey}&lat=${lat}&lng=${lng}&heading=180&pitch=${pitch}&range=${range}`;
+
+    const stopGoto = mark('goto_ms');
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 35000 });
+    stopGoto();
+
+    const stopReady = mark('ready_ms');
+    await page.waitForFunction(() => window.__ready === true, { timeout: 30000 });
+    stopReady();
+
+    const stopShot = mark('screenshot_ms');
+    const image = await page.screenshot({ encoding: 'base64', fullPage: false });
+    stopShot();
+
+    await page.close();
+    return { success: true, timings, pageConsole, pageErrors, image: `data:image/png;base64,${image}` };
+  } finally {
+    await browser.close();
+  }
 }
 
 export async function renderAll(opts) {

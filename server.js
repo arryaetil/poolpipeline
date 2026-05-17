@@ -8,7 +8,7 @@ import { loadFeatures, makeSlug, sseEvent } from './pipeline/utils.js';
 import { geocode } from './pipeline/geocode.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
-import { renderAll } from './pipeline/renders.js';
+import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
@@ -50,6 +50,55 @@ app.get('/demo-runs', (_req, res) => {
     .map((d) => d.name)
     .filter((name) => existsSync(join(outputDir, name, 'edited.png')));
   res.json(runs);
+});
+
+app.get('/test-renders', async (req, res) => {
+  const lat = parseFloat(req.query.lat ?? '51.2194');
+  const lng = parseFloat(req.query.lng ?? '4.4025');
+
+  const diag = {
+    env: {
+      PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH ?? 'not set',
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD ?? 'not set',
+      GOOGLE_KEY: GOOGLE_KEY ? 'set' : 'NOT SET',
+      MAPBOX_TOKEN: MAPBOX_TOKEN ? 'set' : 'NOT SET',
+    },
+  };
+
+  if (!GOOGLE_KEY) {
+    return res.json({ ...diag, error: 'GOOGLE_KEY not set — cannot test Google renders' });
+  }
+
+  try {
+    const googleResult = await renderGoogleDiagnostic({
+      lat, lng, pitch: -50, range: 130,
+      googleKey: GOOGLE_KEY,
+      serverPort: PORT,
+    });
+    return res.json({ ...diag, provider: 'google', ...googleResult });
+  } catch (googleErr) {
+    if (!MAPBOX_TOKEN) {
+      return res.status(500).json({ ...diag, googleError: googleErr.message, error: 'MAPBOX_TOKEN not set — cannot test fallback' });
+    }
+    try {
+      const start = Date.now();
+      let firstImage = null;
+      await renderMapbox({
+        lat, lng, pitch: -50, mapboxToken: MAPBOX_TOKEN,
+        onProgress: (_, b64) => { if (!firstImage) firstImage = b64; },
+      });
+      return res.json({
+        ...diag,
+        provider: 'mapbox',
+        fallback: true,
+        googleError: googleErr.message,
+        mapbox_ms: Date.now() - start,
+        image: firstImage ? `data:image/png;base64,${firstImage}` : null,
+      });
+    } catch (mapboxErr) {
+      return res.status(500).json({ ...diag, googleError: googleErr.message, mapboxError: mapboxErr.message });
+    }
+  }
 });
 
 app.post('/run', async (req, res) => {
@@ -105,7 +154,7 @@ app.post('/run', async (req, res) => {
       range: feature.camera_range,
       mapboxToken: MAPBOX_TOKEN,
       googleKey: GOOGLE_KEY,
-      serverHost: HOST,
+      serverHost: '127.0.0.1',
       serverPort: PORT,
       onProgress: (heading, b64) => {
         writeFileSync(join(outDir, `render-${heading}.png`), Buffer.from(b64, 'base64'));
