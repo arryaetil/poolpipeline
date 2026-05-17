@@ -89,16 +89,6 @@ export async function renderGoogleDiagnostic({ lat, lng, pitch, range, googleKey
 
 export async function renderAll(opts) {
   const googleRender = opts._googleRender ?? renderGoogle;
-  if (opts.googleKey) {
-    try {
-      console.log('[renders] trying Google 3D Tiles');
-      const result = await googleRender(opts);
-      console.log('[renders] Google 3D Tiles succeeded');
-      return result;
-    } catch (err) {
-      console.warn('[renders] Google 3D Tiles failed, falling back to Mapbox:', err.message);
-    }
-  }
-  console.log('[renders] using Mapbox Static API');
-  return renderMapbox(opts);
+  console.log('[renders] using Google 3D Tiles');
+  return googleRender(opts);
 }
