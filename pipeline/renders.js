@@ -10,8 +10,9 @@ function launchBrowser() {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--use-gl=swiftshader',
-      '--enable-webgl',
+      '--use-gl=angle',
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
       '--ignore-gpu-blocklist',
     ],
   });
