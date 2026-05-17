@@ -179,6 +179,25 @@ export async function fetchBuilding(lat, lng, bagKey, country = 'Nederland') {
   return fetchBuildingNetherlands(lat, lng, bagKey);
 }
 
+// ── Render annotation ─────────────────────────────────────────────
+
+export async function annotateRender(renderB64) {
+  const W = 1280, H = 720;
+  const cx = W / 2, cy = H / 2, r = 28, arm = 48;
+  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ff2d55" stroke-width="3"/>
+    <line x1="${cx - arm}" y1="${cy}" x2="${cx - r - 4}" y2="${cy}" stroke="#ff2d55" stroke-width="3"/>
+    <line x1="${cx + r + 4}" y1="${cy}" x2="${cx + arm}" y2="${cy}" stroke="#ff2d55" stroke-width="3"/>
+    <line x1="${cx}" y1="${cy - arm}" x2="${cx}" y2="${cy - r - 4}" stroke="#ff2d55" stroke-width="3"/>
+    <line x1="${cx}" y1="${cy + r + 4}" x2="${cx}" y2="${cy + arm}" stroke="#ff2d55" stroke-width="3"/>
+  </svg>`;
+  const annotated = await sharp(Buffer.from(renderB64, 'base64'))
+    .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+    .png()
+    .toBuffer();
+  return annotated.toString('base64');
+}
+
 // ── Image annotation ──────────────────────────────────────────────
 
 export async function annotateImage(satB64, parcel, building, centerLat, centerLng) {

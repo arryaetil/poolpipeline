@@ -16,11 +16,12 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey, count
 
   const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
 
-TARGET HOUSE IDENTIFICATION — CRITICAL:
-- The camera is aimed directly at the TARGET garden — it occupies the CENTER of this image.
-- The TARGET HOUSE is the house immediately behind that central garden area.
-- DO NOT touch, modify, or add anything to any neighboring house or garden visible in the image.
-- If you are unsure which garden is the target, use the garden closest to the exact center of the image.
+TARGET GARDEN IDENTIFICATION — CRITICAL:
+- A red crosshair marker (circle with crosshairs) is visible at the CENTER of this image. It marks the EXACT TARGET GARDEN.
+- Edit ONLY the garden containing this red marker. No other garden.
+- The TARGET HOUSE is the house immediately adjacent to the marked garden.
+- DO NOT touch, modify, or add anything to any other garden or property visible in the image.
+- Remove the red marker in your output — it should not appear in the final result.
 ${positionBlock}
 ${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}
 ${analysis.render_prompt}
