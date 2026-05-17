@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer';
 
 function getHeadings(backyardHeading) {
   if (backyardHeading == null) return [0, 90, 180, 270];
-  return [-45, 0, 45].map(offset => ((backyardHeading + offset) % 360 + 360) % 360);
+  return [-60, -20, 20, 60].map(offset => ((backyardHeading + offset) % 360 + 360) % 360);
 }
 
 function launchBrowser() {

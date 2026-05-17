@@ -36,8 +36,8 @@ test('renderMapbox returns 3 results centered on backyardHeading', async (t) => 
 
   const results = await renderMapbox({ ...BASE_OPTS, backyardHeading: 180 });
 
-  assert.equal(results.length, 3);
-  assert.deepEqual(results.map((r) => r.heading), [135, 180, 225]);
+  assert.equal(results.length, 4);
+  assert.deepEqual(results.map((r) => r.heading), [120, 160, 200, 240]);
 });
 
 // Test 2 — renderAll uses the Google render function
@@ -45,13 +45,13 @@ test('renderAll uses Google render function', async () => {
   let called = false;
   const fakeGoogle = async () => {
     called = true;
-    return [0, 90, 180].map((heading) => ({ heading, image: 'fake' }));
+    return [0, 90, 180, 270].map((heading) => ({ heading, image: 'fake' }));
   };
 
   const results = await renderAll({ ...BASE_OPTS, _googleRender: fakeGoogle });
 
   assert.ok(called, 'Google render function should be called');
-  assert.equal(results.length, 3);
+  assert.equal(results.length, 4);
 });
 
 // Test 3 — renderAll propagates error when Google throws (no silent fallback)
