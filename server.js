@@ -9,6 +9,7 @@ import { geocode } from './pipeline/geocode.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
+import { fetchParcel, fetchBuilding, annotateImage } from './pipeline/parcel.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
@@ -18,6 +19,7 @@ const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
+const BAG_KEY = process.env.BAG_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const SKIP_VIDEO = process.env.SKIP_VIDEO !== 'false';
@@ -138,8 +140,28 @@ app.post('/run', async (req, res) => {
     writeFileSync(join(outDir, 'satellite.png'), Buffer.from(satB64, 'base64'));
     emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
+    // Parcel + building lookup (Dutch addresses only — degrades gracefully)
+    let parcel = null;
+    let renderLat = geo.lat;
+    let renderLng = geo.lng;
+    let renderRange = feature.camera_range;
+    let satForAnalysis = satB64;
+    try {
+      parcel = await fetchParcel(geo.lat, geo.lng);
+      const building = await fetchBuilding(geo.lat, geo.lng, BAG_KEY);
+      satForAnalysis = await annotateImage(satB64, parcel, building, geo.lat, geo.lng);
+      writeFileSync(join(outDir, 'satellite-annotated.png'), Buffer.from(satForAnalysis, 'base64'));
+      emit('step', { step: 'satellite', status: 'annotated', value: `data:image/png;base64,${satForAnalysis}` });
+      renderLat = parcel.centroid.lat;
+      renderLng = parcel.centroid.lng;
+      renderRange = parcel.range;
+      console.log(`[parcel] ${parcel.width_m}m × ${parcel.depth_m}m → centroid ${renderLat.toFixed(6)},${renderLng.toFixed(6)} range=${renderRange}m`);
+    } catch (err) {
+      console.warn('[parcel] lookup failed, using geocoded point:', err.message);
+    }
+
     currentStep = 'analysis';
-    const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : [], geo.country);
+    const analysis = await analyse(satForAnalysis, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : [], geo.country, parcel);
     if (feature.id === 'pool' && analysis.recommended_pool) {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
       if (matched) {
@@ -167,10 +189,10 @@ app.post('/run', async (req, res) => {
     currentStep = 'renders';
     const renderFn = renderMode === '2d' ? renderMapbox : renderAll;
     const renders = await renderFn({
-      lat: geo.lat,
-      lng: geo.lng,
+      lat: renderLat,
+      lng: renderLng,
       pitch: feature.camera_pitch,
-      range: feature.camera_range,
+      range: renderRange,
       mapboxToken: MAPBOX_TOKEN,
       ionToken: CESIUM_ION_TOKEN,
       serverHost: '127.0.0.1',
