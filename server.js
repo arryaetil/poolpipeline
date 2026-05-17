@@ -142,7 +142,10 @@ app.post('/run', async (req, res) => {
     const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : []);
     if (feature.id === 'pool' && analysis.recommended_pool) {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
-      if (matched) analysis.pool_dimensions = matched.dimensions_m;
+      if (matched) {
+        analysis.pool_dimensions = matched.dimensions_m;
+        analysis.pool_terrace_style = matched.terrace_style;
+      }
     }
     writeFileSync(join(outDir, 'analysis.json'), JSON.stringify(analysis, null, 2));
     emit('step', { step: 'analysis', status: 'done', value: analysis });
