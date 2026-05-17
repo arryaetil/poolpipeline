@@ -179,23 +179,36 @@ export async function fetchBuilding(lat, lng, bagKey, country = 'Nederland') {
   return fetchBuildingNetherlands(lat, lng, bagKey);
 }
 
-// ── Render annotation ─────────────────────────────────────────────
+// ── Render + satellite reference composite ────────────────────────
 
-export async function annotateRender(renderB64) {
-  const W = 1280, H = 720;
-  const cx = W / 2, cy = H / 2, r = 28, arm = 48;
-  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ff2d55" stroke-width="3"/>
-    <line x1="${cx - arm}" y1="${cy}" x2="${cx - r - 4}" y2="${cy}" stroke="#ff2d55" stroke-width="3"/>
-    <line x1="${cx + r + 4}" y1="${cy}" x2="${cx + arm}" y2="${cy}" stroke="#ff2d55" stroke-width="3"/>
-    <line x1="${cx}" y1="${cy - arm}" x2="${cx}" y2="${cy - r - 4}" stroke="#ff2d55" stroke-width="3"/>
-    <line x1="${cx}" y1="${cy + r + 4}" x2="${cx}" y2="${cy + arm}" stroke="#ff2d55" stroke-width="3"/>
-  </svg>`;
-  const annotated = await sharp(Buffer.from(renderB64, 'base64'))
-    .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+export async function compositeRenderWithSatellite(renderB64, satB64) {
+  const THUMB = 220;
+  const PAD = 12;
+
+  // Resize satellite to thumbnail
+  const thumb = await sharp(Buffer.from(satB64, 'base64'))
+    .resize(THUMB, THUMB)
     .png()
     .toBuffer();
-  return annotated.toString('base64');
+
+  // Label SVG overlay on the thumbnail
+  const labelSvg = `<svg width="${THUMB}" height="${THUMB}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="${THUMB}" height="20" fill="rgba(0,0,0,0.7)"/>
+    <text x="6" y="14" font-size="11" fill="lime" font-family="sans-serif" font-weight="bold">TARGET (groene lijn)</text>
+    <rect x="0" y="0" width="${THUMB}" height="${THUMB}" fill="none" stroke="lime" stroke-width="2"/>
+  </svg>`;
+
+  const labelledThumb = await sharp(thumb)
+    .composite([{ input: Buffer.from(labelSvg), top: 0, left: 0 }])
+    .png()
+    .toBuffer();
+
+  const result = await sharp(Buffer.from(renderB64, 'base64'))
+    .composite([{ input: labelledThumb, top: PAD, left: PAD }])
+    .png()
+    .toBuffer();
+
+  return result.toString('base64');
 }
 
 // ── Image annotation ──────────────────────────────────────────────

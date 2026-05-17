@@ -8,20 +8,17 @@ function poolScaleHint(analysis) {
   return ` The pool should occupy approximately ${depthPct}% of the visible lawn depth and ${widthPct}% of the lawn width — no larger.`;
 }
 
-export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null, satB64 = null) {
+export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
   const countryLabel = country === 'België' || country === 'Belgium' ? 'Belgian' : country === 'Nederland' ? 'Dutch' : '';
   const positionBlock = analysis.recommendation
     ? `\nPOOL POSITION: ${analysis.recommendation}\n`
     : '';
-  const satelliteBlock = satB64
-    ? `\nREFERENCE IMAGE: The first image is a satellite photo of the same area. The TARGET PROPERTY is outlined with a GREEN dashed line. An ORANGE outline shows the building footprint. Match this property in the aerial render and edit ONLY that garden.\n`
-    : '';
 
-  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY shown in the reference satellite image.
-${satelliteBlock}
+  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY in this image.
+
 TARGET GARDEN IDENTIFICATION — CRITICAL:
-- Use the satellite reference image (first image) to identify the correct property — it is outlined in green.
-- Find that SAME property in the aerial render (second image) and edit ONLY its garden.
+- A small satellite reference inset is visible in the TOP-LEFT CORNER of this image. The TARGET PROPERTY is outlined with a GREEN dashed line in that inset.
+- Find that SAME property in the main aerial image and edit ONLY its garden.
 - DO NOT touch any neighboring garden or property.
 ${positionBlock}
 ${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}
@@ -35,12 +32,8 @@ STRICT RULES — do not break these:
 - Do NOT change the framing, zoom level, or camera angle.
 - Do NOT change the color, brightness, or texture of any grass or lawn — the grass outside the terrace must be pixel-perfect identical to the original.
 - Keep every pixel outside the pool and terrace area identical to the original.
+- Remove the satellite inset from the top-left corner in your output.
 - This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
-
-  const imageContent = [
-    ...(satB64 ? [{ type: 'image_url', image_url: { url: `data:image/png;base64,${satB64}` } }] : []),
-    { type: 'image_url', image_url: { url: `data:image/png;base64,${chosenRenderB64}` } },
-  ];
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
     model: 'google/gemini-3-pro-image-preview',
@@ -48,7 +41,7 @@ STRICT RULES — do not break these:
       role: 'user',
       content: [
         { type: 'text', text: prompt },
-        ...imageContent,
+        { type: 'image_url', image_url: { url: `data:image/png;base64,${chosenRenderB64}` } },
       ],
     }],
     modalities: ['image', 'text'],

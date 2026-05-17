@@ -9,7 +9,7 @@ import { geocode } from './pipeline/geocode.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
-import { fetchParcel, fetchBuilding, annotateImage, gardenCentroid } from './pipeline/parcel.js';
+import { fetchParcel, fetchBuilding, annotateImage, compositeRenderWithSatellite, gardenCentroid } from './pipeline/parcel.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
@@ -216,9 +216,12 @@ app.post('/run', async (req, res) => {
     writeFileSync(join(outDir, 'chosen.json'), JSON.stringify({ heading: viewResult.chosen_heading, reason: viewResult.reason }, null, 2));
 
     const chosenRender = renders.find((item) => item.heading === viewResult.chosen_heading) ?? renders[0];
+    const renderForEdit = satForAnalysis !== satB64
+      ? await compositeRenderWithSatellite(chosenRender.image, satForAnalysis)
+      : chosenRender.image;
 
     currentStep = 'edit';
-    const editedB64 = await editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country, satForAnalysis);
+    const editedB64 = await editImage(renderForEdit, feature, analysis, OR_KEY, geo.country);
     writeFileSync(join(outDir, 'edited.png'), Buffer.from(editedB64, 'base64'));
     emit('step', { step: 'edit', status: 'done', value: `data:image/png;base64,${editedB64}` });
 
