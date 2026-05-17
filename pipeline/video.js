@@ -31,9 +31,11 @@ Atmosphere: ${feature.video_prompt} High-end real-estate listing style. ${analys
   }
   const { id } = await startRes.json();
 
-  // Poll until completed
+  // Poll until completed (max 24 attempts = 2 minutes)
   let status = 'pending';
+  let attempts = 0;
   while (status !== 'completed') {
+    if (++attempts > 24) throw new Error('Veo generation timed out after 2 minutes');
     await new Promise(r => setTimeout(r, 5000));
     const pollRes = await fetch(`${OR_BASE}/videos/${id}`, { headers: orHeaders(orKey) });
     if (!pollRes.ok) throw new Error(`Veo poll failed: ${pollRes.status}`);

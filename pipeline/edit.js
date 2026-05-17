@@ -44,7 +44,7 @@ STRICT RULES — do not break these:
       ],
     }],
     modalities: ['image', 'text'],
-  });
+  }, 180000);
 
   const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
   if (!imgUrl) throw new Error('No image returned from Nano Banana Pro');

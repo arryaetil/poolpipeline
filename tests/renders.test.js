@@ -5,9 +5,7 @@ import { extractJson, orPost } from '../pipeline/utils.js';
 
 const FAKE_AB = new ArrayBuffer(10);
 
-const HEADINGS = [0, 90, 180, 270];
-
-const MAPBOX_OPTS = {
+const BASE_OPTS = {
   lat: 51.05,
   lng: 3.72,
   pitch: -50,
@@ -15,18 +13,31 @@ const MAPBOX_OPTS = {
   onProgress: () => {},
 };
 
-// Test 1 — renderMapbox returns 4 results with correct headings
-test('renderMapbox returns 4 results with correct headings', async (t) => {
+// Test 1 — renderMapbox returns 4 cardinal headings when no backyardHeading given
+test('renderMapbox returns 4 results with cardinal headings when no backyardHeading', async (t) => {
   t.mock.method(globalThis, 'fetch', async () => ({
     ok: true,
     arrayBuffer: async () => FAKE_AB,
   }));
 
-  const results = await renderMapbox(MAPBOX_OPTS);
+  const results = await renderMapbox(BASE_OPTS);
 
   assert.equal(results.length, 4);
   assert.deepEqual(results.map((r) => r.heading), [0, 90, 180, 270]);
   results.forEach((r) => assert.ok(r.image.length > 0));
+});
+
+// Test 1b — renderMapbox returns 3 headings centered on backyardHeading
+test('renderMapbox returns 3 results centered on backyardHeading', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => ({
+    ok: true,
+    arrayBuffer: async () => FAKE_AB,
+  }));
+
+  const results = await renderMapbox({ ...BASE_OPTS, backyardHeading: 180 });
+
+  assert.equal(results.length, 3);
+  assert.deepEqual(results.map((r) => r.heading), [135, 180, 225]);
 });
 
 // Test 2 — renderAll uses the Google render function
@@ -34,20 +45,20 @@ test('renderAll uses Google render function', async () => {
   let called = false;
   const fakeGoogle = async () => {
     called = true;
-    return HEADINGS.map((heading) => ({ heading, image: 'fake' }));
+    return [0, 90, 180].map((heading) => ({ heading, image: 'fake' }));
   };
 
-  const results = await renderAll({ ...MAPBOX_OPTS, _googleRender: fakeGoogle });
+  const results = await renderAll({ ...BASE_OPTS, _googleRender: fakeGoogle });
 
   assert.ok(called, 'Google render function should be called');
-  assert.equal(results.length, 4);
+  assert.equal(results.length, 3);
 });
 
 // Test 3 — renderAll propagates error when Google throws (no silent fallback)
 test('renderAll propagates error when Google throws', async () => {
   await assert.rejects(
     () => renderAll({
-      ...MAPBOX_OPTS,
+      ...BASE_OPTS,
       _googleRender: async () => { throw new Error('Puppeteer failed'); },
     }),
     /Puppeteer failed/,

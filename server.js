@@ -22,7 +22,7 @@ const OR_KEY = process.env.OPENROUTER_KEY;
 const BAG_KEY = process.env.BAG_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
-const SKIP_VIDEO = process.env.SKIP_VIDEO !== 'false';
+const ENABLE_VIDEO = process.env.ENABLE_VIDEO === 'true';
 
 const features = loadFeatures();
 const poolCatalog = JSON.parse(
@@ -208,6 +208,7 @@ app.post('/run', async (req, res) => {
         });
       },
     });
+    emit('step', { step: 'renders', status: 'done', value: { count: renders.length } });
 
     currentStep = 'view_select';
     const viewResult = await selectView(renders, satB64, analysis, OR_KEY);
@@ -222,7 +223,7 @@ app.post('/run', async (req, res) => {
     emit('step', { step: 'edit', status: 'done', value: `data:image/png;base64,${editedB64}` });
 
     currentStep = 'video';
-    if (SKIP_VIDEO) {
+    if (!ENABLE_VIDEO) {
       emit('step', {
         step: 'video',
         status: 'skipped',

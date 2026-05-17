@@ -583,13 +583,14 @@ function handleStep({ step, status, value }) {
     showAnalysis(value);
   }
   if (step === 'renders') {
-    if (value?.image) {
+    if (status === 'done') {
+      setStep('renders', 'done'); setStep('view_select', 'active');
+    } else if (value?.image) {
       renderStore[value.heading] = value.image;
-      showLivePreview(value.image, `3D render ${rendersCount + 1} / 4`);
+      rendersCount += 1;
+      showLivePreview(value.image, `3D render ${rendersCount}`);
+      document.getElementById('txt-renders').textContent = `3D renders gemaakt (${rendersCount})`;
     }
-    rendersCount += 1;
-    document.getElementById('txt-renders').textContent = `3D renders gemaakt (${rendersCount} / 4)`;
-    if (rendersCount === 4) { setStep('renders', 'done'); setStep('view_select', 'active'); }
   }
   if (step === 'view_select') {
     setStep('view_select', 'done');
