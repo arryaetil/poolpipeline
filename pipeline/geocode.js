@@ -5,5 +5,7 @@ export async function geocode(address, googleKey) {
   if (json.status !== 'OK') throw new Error(`Geocoding failed: ${json.status}`);
   const { lat, lng } = json.results[0].geometry.location;
   const formatted = json.results[0].formatted_address;
-  return { lat, lng, formatted };
+  const countryComponent = json.results[0].address_components.find(c => c.types.includes('country'));
+  const country = countryComponent?.long_name ?? 'unknown';
+  return { lat, lng, formatted, country };
 }

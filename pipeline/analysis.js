@@ -1,11 +1,13 @@
 import { extractJson, orPost } from './utils.js';
 
-export async function analyse(satB64, feature, orKey, poolCatalog = []) {
+export async function analyse(satB64, feature, orKey, poolCatalog = [], country = null) {
   const catalogSection = poolCatalog.length > 0
     ? `\nAQUAPURA ZWEMBAD CATALOGUS:\n${poolCatalog.map(p => `- ${p.name}: ${p.dimensions_m}m — ${p.ideal_garden}`).join('\n')}\n\nKies het meest geschikte model op basis van de achtertuin. Geef de naam terug als recommended_pool en leg je keuze kort uit in pool_reasoning (Nederlands).`
     : '';
 
-  const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.
+  const countryLine = country ? `\nHet adres bevindt zich in: ${country}.\n` : '';
+
+  const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.${countryLine}
 
 BELANGRIJK: De VOORKANT van de woning grenst aan de straat/oprit. De TUIN (achtertuin) bevindt zich aan de TEGENOVERGESTELDE zijde — doorgaans omheind, met gras, weg van de straat. Verwar ze nooit.
 
@@ -18,7 +20,7 @@ BELANGRIJK: De VOORKANT van de woning grenst aan de straat/oprit. De TUIN (achte
 ${catalogSection}
 
 TERRAS MATERIAAL: Bekijk de stijl van de woning en de bestaande tuin. Kies het meest passende terrasmateriaal rondom het zwembad uit deze Aquapura opties:
-- "arduin" — Belgische blauwesteen tegels, donkergrijs natuursteen (past bij klassieke, landelijke of traditionele Belgische woningen)
+- "arduin" — blauwesteen tegels, donkergrijs natuursteen (past bij klassieke, landelijke of traditionele woningen)
 - "composiet" — composiet houtlook vlonderplanken, grijsbruin (past bij moderne en eigentijdse woningen)
 - "tropisch hardhout" — naturel ipé of bangkirai hardhouten vlonder, warme bruine tint (past bij woningen met warm karakter of bestaande houten elementen)
 - "keramische tegels" — grote lichtgrijze keramische tegels (past bij ultra-moderne of minimalistische woningen)

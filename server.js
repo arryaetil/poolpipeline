@@ -139,14 +139,14 @@ app.post('/run', async (req, res) => {
     emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
     currentStep = 'analysis';
-    const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : []);
+    const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : [], geo.country);
     if (feature.id === 'pool' && analysis.recommended_pool) {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
       if (matched) {
         analysis.pool_dimensions = matched.dimensions_m;
         // Build terrace style from analysis material choice + model furniture
         const materialMap = {
-          'arduin':             'dark grey Belgian arduin (bluestone) slabs',
+          'arduin':             'dark grey natural stone arduin (bluestone) slabs',
           'composiet':          'grey-brown composite wood-look decking boards',
           'tropisch hardhout':  'warm natural ipé tropical hardwood deck',
           'keramische tegels':  'large light grey ceramic tiles',
