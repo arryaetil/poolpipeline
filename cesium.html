@@ -67,16 +67,15 @@
   );
   viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 
-  // Wait until tiles stop streaming for 30 consecutive frames, or 25s
+  // Wait until tiles stop streaming, or 30s max. Use setInterval — rAF stalls in headless Chrome.
   let stable = 0;
   await new Promise(resolve => {
-    const tid = setTimeout(resolve, 25000);
-    (function tick() {
+    const tid = setTimeout(resolve, 30000);
+    const iv = setInterval(() => {
       viewer.render();
       stable = tileset.tilesLoaded ? stable + 1 : 0;
-      if (stable >= 30) { clearTimeout(tid); return resolve(); }
-      requestAnimationFrame(tick);
-    })();
+      if (stable >= 10) { clearTimeout(tid); clearInterval(iv); resolve(); }
+    }, 100);
   });
 
   window.__ready = true;
