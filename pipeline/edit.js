@@ -1,35 +1,28 @@
 import { orPost } from './utils.js';
 
 export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
-  const countryLabel = country === 'België' || country === 'Belgium' ? 'Belgian' : country === 'Nederland' ? 'Dutch' : '';
-  const positionBlock = analysis.recommendation
-    ? `\nPOOL POSITION: ${analysis.recommendation}\n`
-    : '';
   const dimensionsLine = analysis.pool_dimensions
-    ? `Pool dimensions: ${analysis.pool_dimensions}m — scale accordingly.\n`
+    ? `Pool dimensions: ${analysis.pool_dimensions}m.\n`
+    : '';
+  const terraceStyle = analysis.pool_terrace_style
+    ? `${analysis.pool_terrace_style}\n`
+    : '';
+  const renderPrompt = analysis.render_prompt
+    ? `${analysis.render_prompt}\n`
     : '';
 
-  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
+  const prompt = `Add a realistic inground swimming pool to the backyard of the TARGET HOUSE in this oblique aerial photo.
 
-TARGET HOUSE IDENTIFICATION — CRITICAL:
-- This photo was taken from a drone hovering OVER THE BACKYARD, looking across the backyard toward the back of the house.
-- The BACKYARD is the grass/lawn area in the FOREGROUND of the image — between the bottom edge of the photo and the target house.
-- The FRONT of the house (driveway, street, road) is BEHIND the house in the BACKGROUND — often partially hidden by the house itself.
+HOW TO IDENTIFY THE CORRECT SPOT:
+- The target house is the one closest to the center of the frame.
+- This photo was taken from a drone hovering OVER THE BACKYARD, looking across the backyard toward the house.
+- The BACKYARD is the grass/lawn area in the FOREGROUND of the image (between the bottom edge of the photo and the target house).
+- The FRONT of the house (driveway, street, road) is BEHIND the house, in the BACKGROUND — often partially hidden by the house itself.
 - Place the pool ONLY in the foreground grass/lawn area. NEVER between the house and any road/driveway in the background. NEVER on a neighbour's lot.
-- DO NOT touch, modify, or add anything to any neighboring house or garden.
-${positionBlock}
-${dimensionsLine}${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
-${analysis.render_prompt ? analysis.render_prompt : ''}
 
-STRICT RULES — do not break these:
-- Add ONLY the swimming pool and its immediate terrace. Nothing else.
-- Do NOT add trees, plants, shrubs, or any vegetation anywhere in the image.
-- Do NOT modify the house, roof, walls, windows, or driveway.
-- Do NOT modify neighboring properties in any way.
-- Do NOT change the framing, zoom level, or camera angle.
-- Do NOT change the color, brightness, or texture of any grass or lawn — the grass outside the terrace must be pixel-perfect identical to the original.
-- Keep every pixel outside the pool and terrace area identical to the original.
-- This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
+The pool must be strictly rectangular — no curved or round shapes.
+${dimensionsLine}${renderPrompt}${terraceStyle}
+Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbours, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle.`;
 
   const models = [
     'google/gemini-3-pro-image-preview',
