@@ -46,7 +46,7 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
       role: 'user',
       content: [
         { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: `data:image/png;base64,${satB64}` } },
+        { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${satB64}` } },
       ],
     }],
   });
