@@ -10,7 +10,7 @@ import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
 import { selectView } from './pipeline/viewSelect.js';
-import { editImage } from './pipeline/edit.js';
+import { editImage, enhanceImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -99,6 +99,18 @@ app.get('/test-renders', async (req, res) => {
     } catch (mapboxErr) {
       return res.status(500).json({ ...diag, googleError: googleErr.message, mapboxError: mapboxErr.message });
     }
+  }
+});
+
+app.post('/enhance', async (req, res) => {
+  const { image } = req.body ?? {};
+  if (!image) return res.status(400).json({ error: 'image is required' });
+  if (!OR_KEY) return res.status(500).json({ error: 'OPENROUTER_KEY must be set' });
+  try {
+    const enhanced = await enhanceImage(image, OR_KEY);
+    res.json({ image: enhanced });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

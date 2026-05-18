@@ -131,6 +131,19 @@ body {
 .gen-btn:active { transform: translateY(0); opacity: 0.85; }
 .gen-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
+.btn-enhance {
+  width: 100%; margin-top: 10px;
+  background: linear-gradient(135deg, rgba(184,148,63,0.15), rgba(184,148,63,0.08));
+  border: 1px solid rgba(184,148,63,0.40); color: #d4a848;
+  border-radius: 12px; padding: 13px; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background 0.2s, border-color 0.2s, transform 0.18s;
+}
+.btn-enhance i { width: 15px; height: 15px; }
+.btn-enhance:hover { background: rgba(184,148,63,0.22); border-color: rgba(184,148,63,0.6); transform: translateY(-1px); }
+.btn-enhance:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
 .render-toggle { display: flex; gap: 10px; justify-content: center; }
 .rtoggle-btn {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
@@ -418,6 +431,9 @@ body {
       <button class="btn-dl" id="btnDownload" type="button"><i data-lucide="download"></i>Download render</button>
       <button class="btn-reset" id="btnReset" type="button"><i data-lucide="rotate-ccw"></i>Nieuw adres</button>
     </div>
+    <button class="btn-enhance hidden" id="btnEnhance" type="button">
+      <i data-lucide="sparkles"></i>Enhance result
+    </button>
   </div>
 
   </div><!-- end main-grid -->
@@ -702,6 +718,35 @@ function showResult(beforeSrc, afterSrc) {
     document.getElementById(id).classList.remove('hidden');
   });
   lucide.createIcons({ nodes: [document.getElementById('baHandle')] });
+  document.getElementById('btnEnhance').classList.remove('hidden');
+  lucide.createIcons({ nodes: [document.getElementById('btnEnhance')] });
+}
+
+async function enhance() {
+  const btn = document.getElementById('btnEnhance');
+  if (!editedSrc) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader"></i>Bezig met enhancen...';
+  lucide.createIcons({ nodes: [btn] });
+  try {
+    const base64 = editedSrc.startsWith('data:') ? editedSrc.replace(/^data:image\/\w+;base64,/, '') : editedSrc;
+    const res = await fetch('/enhance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64 }),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    const { image } = await res.json();
+    editedSrc = `data:image/png;base64,${image}`;
+    document.getElementById('imgAfter').src = editedSrc;
+    btn.innerHTML = '<i data-lucide="check"></i>Enhanced!';
+    lucide.createIcons({ nodes: [btn] });
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="sparkles"></i>Enhance result';
+    lucide.createIcons({ nodes: [btn] });
+    alert('Enhance mislukt: ' + err.message);
+  }
 }
 
 // Download
@@ -716,6 +761,10 @@ function download() {
 // Reset
 function reset() {
   document.getElementById('addrInput').value = '';
+  const enhBtn = document.getElementById('btnEnhance');
+  enhBtn.classList.add('hidden');
+  enhBtn.disabled = false;
+  enhBtn.innerHTML = '<i data-lucide="sparkles"></i>Enhance result';
   ['progressCard','previewCard','analysisCard','resultCard'].forEach(id => {
     document.getElementById(id).classList.add('hidden');
   });
@@ -733,6 +782,7 @@ function reset() {
 document.getElementById('genBtn').addEventListener('click', run);
 document.getElementById('btnDownload').addEventListener('click', download);
 document.getElementById('btnReset').addEventListener('click', reset);
+document.getElementById('btnEnhance').addEventListener('click', enhance);
 document.getElementById('addrInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
 document.querySelectorAll('.rtoggle-btn').forEach((b) => b.addEventListener('click', () => selectRenderMode(b.dataset.mode)));
 

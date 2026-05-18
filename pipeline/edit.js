@@ -60,3 +60,39 @@ Keep the rest of the image pixel-identical — same house, roof, windows, trees,
   }
   throw new Error(`Image edit failed on all models: ${lastErr.message}`);
 }
+
+export async function enhanceImage(imageB64, orKey) {
+  const mimeType = imageB64.startsWith('/9j/') ? 'image/jpeg' : 'image/png';
+  const models = [
+    'google/gemini-3-pro-image-preview',
+    'google/gemini-3.1-flash-image-preview',
+    'google/gemini-2.5-flash-image',
+  ];
+  const body = (model) => ({
+    model,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: 'Can you improve this image by making it more visually appealing without losing the context of what is currently in the image.' },
+        { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageB64}` } },
+      ],
+    }],
+    modalities: ['image', 'text'],
+  });
+
+  let lastErr;
+  for (const model of models) {
+    try {
+      const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, body(model), 180000);
+      const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
+      if (!imgUrl) throw new Error('No image in response');
+      console.log(`[enhance] success with ${model}`);
+      return imgUrl.replace(/^data:image\/\w+;base64,/, '');
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[enhance] ${model} failed: ${err.message}`);
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+  throw new Error(`Enhance failed on all models: ${lastErr.message}`);
+}
