@@ -7,9 +7,7 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey, count
   const terraceStyle = analysis.pool_terrace_style
     ? `${analysis.pool_terrace_style}\n`
     : '';
-  const renderPrompt = analysis.render_prompt
-    ? `${analysis.render_prompt}\n`
-    : '';
+  const renderPrompt = `Photorealistic inground swimming pool with vivid bright blue water, subtle light caustics visible on the pool floor, clean rectangular shape with precise geometric edges, dark grey Belgian arduin bluestone coping flush with the surrounding terrace.\n`;
 
   const prompt = `Add a realistic inground swimming pool to the backyard of the TARGET HOUSE in this oblique aerial photo.
 

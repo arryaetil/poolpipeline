@@ -28,7 +28,6 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
   "recommendation": "...",
   "recommended_pool": "...",
   "pool_reasoning": "...",
-  "render_prompt": "...",
   "backyard_camera_heading": <number>
 }`;
 

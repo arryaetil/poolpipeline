@@ -2,7 +2,7 @@
   {
     "id": "city",
     "name": "City",
-    "size_label": "small",
+    "size_label": "compact",
     "dimensions_m": "7.0 × 3.0",
     "ideal_garden": "compact urban garden up to roughly 10m deep",
     "terrace_style": "sleek minimal grey arduin stone terrace flush with coping, clean lines, no furniture"
@@ -10,7 +10,7 @@
   {
     "id": "zenn",
     "name": "Zenn",
-    "size_label": "medium",
+    "size_label": "standard",
     "dimensions_m": "8.6 × 3.5",
     "ideal_garden": "medium backyard roughly 10–20m deep",
     "terrace_style": "grey Belgian arduin bluestone slabs flush with pool coping on all sides, 2 white minimal sunloungers on the long side"
@@ -18,7 +18,7 @@
   {
     "id": "xl",
     "name": "XL",
-    "size_label": "large",
+    "size_label": "spacious",
     "dimensions_m": "10.0 × 4.0",
     "ideal_garden": "spacious backyard 20m deep or more",
     "terrace_style": "grey arduin stone slabs on all sides, 2–3 white sunloungers on the long sunny side"
