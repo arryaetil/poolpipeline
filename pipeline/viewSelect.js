@@ -17,7 +17,7 @@ Respond in JSON only: { "chosen_heading": <${headings.join('|')}>, "reason": "..
   }));
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
-    model: 'anthropic/claude-opus-4',
+    model: 'anthropic/claude-opus-4.5',
     max_tokens: 500,
     messages: [{
       role: 'user',

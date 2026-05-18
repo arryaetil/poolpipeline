@@ -40,7 +40,7 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
 }`;
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
-    model: 'anthropic/claude-opus-4',
+    model: 'anthropic/claude-opus-4.5',
     max_tokens: 2000,
     messages: [{
       role: 'user',
