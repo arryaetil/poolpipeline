@@ -12,10 +12,11 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey, count
   const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
 
 TARGET HOUSE IDENTIFICATION — CRITICAL:
-- The camera is aimed directly at the TARGET garden — it occupies the CENTER of this image.
-- The TARGET HOUSE is the house immediately behind that central garden area.
-- DO NOT touch, modify, or add anything to any neighboring house or garden visible in the image.
-- If you are unsure which garden is the target, use the garden closest to the exact center of the image.
+- This photo was taken from a drone hovering OVER THE BACKYARD, looking across the backyard toward the back of the house.
+- The BACKYARD is the grass/lawn area in the FOREGROUND of the image — between the bottom edge of the photo and the target house.
+- The FRONT of the house (driveway, street, road) is BEHIND the house in the BACKGROUND — often partially hidden by the house itself.
+- Place the pool ONLY in the foreground grass/lawn area. NEVER between the house and any road/driveway in the background. NEVER on a neighbour's lot.
+- DO NOT touch, modify, or add anything to any neighboring house or garden.
 ${positionBlock}
 ${dimensionsLine}${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
 ${analysis.render_prompt ? analysis.render_prompt : ''}

@@ -27,18 +27,6 @@ test('renderMapbox returns 4 results with cardinal headings when no backyardHead
   results.forEach((r) => assert.ok(r.image.length > 0));
 });
 
-// Test 1b — renderMapbox returns 3 headings centered on backyardHeading
-test('renderMapbox returns 3 results centered on backyardHeading', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => ({
-    ok: true,
-    arrayBuffer: async () => FAKE_AB,
-  }));
-
-  const results = await renderMapbox({ ...BASE_OPTS, backyardHeading: 180 });
-
-  assert.equal(results.length, 4);
-  assert.deepEqual(results.map((r) => r.heading), [120, 160, 200, 240]);
-});
 
 // Test 2 — renderAll uses the Google render function
 test('renderAll uses Google render function', async () => {

@@ -169,7 +169,6 @@ app.post('/run', async (req, res) => {
       lng: geo.lng,
       pitch: feature.camera_pitch,
       range: feature.camera_range,
-      backyardHeading: analysis.backyard_camera_heading ?? null,
       mapboxToken: MAPBOX_TOKEN,
       ionToken: CESIUM_ION_TOKEN,
       serverHost: '127.0.0.1',

@@ -4,8 +4,8 @@
     "label": "Zwembad",
     "label_en": "swimming pool",
     "emoji": "🏊",
-    "camera_pitch": -45,
-    "camera_range": 90,
+    "camera_pitch": -50,
+    "camera_range": 130,
     "analysis_hint": "Recommend an inground swimming pool strictly in the backyard. Estimate the usable backyard width and length in metres to help select the right pool model. Note whether the garden is compact/urban or large/suburban.",
     "edit_prompt": "Add a photorealistic Aquapura inground swimming pool. The water must be vivid bright blue — rich, vibrant, highly reflective with subtle light caustics visible on the pool floor. Strictly rectangular shape with clean geometric edges. Dark grey Belgian bluestone coping flush with the surrounding terrace. Do not change the rest of the garden.",
     "video_prompt": "Sparkling crystal-clear light blue-green pool water with gentle ripples, dark grey Belgian bluestone coping, anthracite rolling cover partially retracted, warm golden-hour lighting over a manicured Belgian garden."
