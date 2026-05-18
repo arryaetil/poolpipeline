@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BackyardAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,10 +18,22 @@ body {
     radial-gradient(ellipse 80% 55% at 15% 5%, rgba(184,148,63,0.20) 0%, transparent 55%),
     radial-gradient(ellipse 70% 60% at 85% 85%, rgba(20,70,140,0.28) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,25,55,0.9) 0%, transparent 100%);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #f0f6ff;
   padding: 40px 24px 60px;
 }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page > * {
+  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.page > *:nth-child(1) { animation-delay: 0.05s; }
+.page > *:nth-child(2) { animation-delay: 0.12s; }
+.page > *:nth-child(3) { animation-delay: 0.19s; }
+.page > *:nth-child(4) { animation-delay: 0.26s; }
 
 .page { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
@@ -309,21 +324,26 @@ body {
 .divider-text { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.18); font-weight: 500; white-space: nowrap; }
 
 /* Use case block */
-.usecase-card { padding: 36px 28px 32px; }
-.usecase-header { text-align: center; margin-bottom: 28px; }
-.usecase-eyebrow { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: #B8943F; font-weight: 600; margin-bottom: 12px; display: block; }
+.usecase-card { padding: 48px 36px 40px; }
+.usecase-header { text-align: center; margin-bottom: 36px; }
+.usecase-eyebrow {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(184,148,63,0.75); font-weight: 500; margin-bottom: 16px;
+  display: block; font-family: 'DM Sans', sans-serif;
+}
 .usecase-title {
-  font-size: 22px; font-weight: 700; line-height: 1.25; letter-spacing: -0.4px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 34px; font-weight: 300; line-height: 1.15; letter-spacing: 0px;
   background: linear-gradient(160deg, #ffffff 30%, rgba(255,255,255,0.65) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
-.usecase-sub { font-size: 14px; color: rgba(255,255,255,0.38); line-height: 1.6; }
+.usecase-sub { font-size: 14px; color: rgba(255,255,255,0.35); line-height: 1.7; font-weight: 300; }
 .usecase-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
 .uc-item {
   background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 16px; padding: 20px;
-  display: flex; align-items: flex-start; gap: 16px;
+  border-radius: 16px; padding: 22px;
+  display: flex; align-items: flex-start; gap: 18px;
   transition: background 0.2s, border-color 0.2s;
 }
 .uc-item:hover { background: rgba(255,255,255,0.055); border-color: rgba(184,148,63,0.2); }
@@ -334,8 +354,8 @@ body {
 }
 .uc-icon-wrap i { width: 18px; height: 18px; }
 .uc-body { flex: 1; }
-.uc-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.85); margin-bottom: 5px; }
-.uc-desc { font-size: 13px; color: rgba(255,255,255,0.38); line-height: 1.55; }
+.uc-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.88); margin-bottom: 6px; letter-spacing: 0.1px; }
+.uc-desc { font-size: 13px; color: rgba(255,255,255,0.35); line-height: 1.65; font-weight: 300; }
 .cta-btn {
   width: 100%; background: rgba(184,148,63,0.09); border: 1px solid rgba(184,148,63,0.30);
   color: #d4a848; border-radius: 14px; padding: 16px; font-size: 14px; font-weight: 600;
