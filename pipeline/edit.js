@@ -27,7 +27,11 @@ STRICT RULES:
 - Keep every pixel outside the pool and terrace area identical to the original.
 - Match the visual style of the input image exactly.`;
 
-  const models = ['google/gemini-3-pro-image-preview', 'google/gemini-3.1-flash-image-preview'];
+  const models = [
+    'google/gemini-2.5-flash-image',
+    'google/gemini-3.1-flash-image-preview',
+    'google/gemini-3-pro-image-preview',
+  ];
   const body = (model) => ({
     model,
     messages: [{
@@ -42,19 +46,20 @@ STRICT RULES:
 
   let lastErr;
   for (const model of models) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, body(model), 180000);
-        const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
-        if (!imgUrl) throw new Error('No image in response');
-        console.log(`[edit] success with ${model} (attempt ${attempt})`);
-        return imgUrl.replace(/^data:image\/\w+;base64,/, '');
-      } catch (err) {
-        lastErr = err;
-        console.warn(`[edit] ${model} attempt ${attempt} failed: ${err.message}`);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
+    try {
+      const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, body(model), 180000);
+      const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
+      if (!imgUrl) {
+        console.warn(`[edit] ${model} returned no image, full response:`, JSON.stringify(data).slice(0, 500));
+        throw new Error('No image in response');
       }
+      console.log(`[edit] success with ${model}`);
+      return imgUrl.replace(/^data:image\/\w+;base64,/, '');
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[edit] ${model} failed: ${err.message}`);
+      await new Promise(r => setTimeout(r, 3000));
     }
   }
-  throw new Error(`Image edit failed after all retries: ${lastErr.message}`);
+  throw new Error(`Image edit failed on all models: ${lastErr.message}`);
 }
