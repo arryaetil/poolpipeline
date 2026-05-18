@@ -35,7 +35,7 @@ Keep the rest of the image pixel-identical — same house, roof, windows, trees,
       role: 'user',
       content: [
         { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: `data:image/png;base64,${chosenRenderB64}` } },
+        { type: 'image_url', image_url: { url: `data:${chosenRenderB64.startsWith('/9j/') ? 'image/jpeg' : 'image/png'};base64,${chosenRenderB64}` } },
       ],
     }],
     modalities: ['image', 'text'],

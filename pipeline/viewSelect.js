@@ -12,7 +12,7 @@ Respond in JSON only: { "chosen_heading": <0|90|180|270>, "reason": "..." }`;
 
   const imageContent = renders.map(r => ({
     type: 'image_url',
-    image_url: { url: `data:image/png;base64,${r.image}` },
+    image_url: { url: `data:${r.mimeType ?? 'image/png'};base64,${r.image}` },
   }));
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {

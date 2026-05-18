@@ -39,7 +39,7 @@ async function renderGoogle({ lat, lng, pitch, range, ionToken, serverHost, serv
       const screenshot = await page.screenshot({ encoding: 'base64', fullPage: false });
       await page.close();
       onProgress(heading, screenshot);
-      return { heading, image: screenshot };
+      return { heading, image: screenshot, mimeType: 'image/png' };
     }));
     return results;
   } finally {
@@ -61,7 +61,7 @@ export async function renderMapbox({ lat, lng, pitch, mapboxToken, onProgress })
     const buffer = await res.arrayBuffer();
     const b64 = Buffer.from(buffer).toString('base64');
     onProgress(heading, b64);
-    return { heading, image: b64 };
+    return { heading, image: b64, mimeType: 'image/jpeg' };
   }));
   return results;
 }
