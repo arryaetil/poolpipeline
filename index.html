@@ -131,6 +131,28 @@ body {
 .gen-btn:active { transform: translateY(0); opacity: 0.85; }
 .gen-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
+.option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.option-thumb {
+  border-radius: 14px; overflow: hidden; cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  transition: border-color 0.2s, transform 0.18s;
+  position: relative;
+}
+.option-thumb:hover { border-color: rgba(184,148,63,0.45); transform: translateY(-2px); }
+.option-thumb.selected { border-color: #d4a848; box-shadow: 0 0 20px rgba(184,148,63,0.25); }
+.option-thumb img { width: 100%; display: block; }
+.opt-loading {
+  aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; padding: 12px;
+}
+.opt-label {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+  padding: 3px 10px; border-radius: 99px; white-space: nowrap; pointer-events: none;
+}
+
 .btn-enhance {
   width: 100%; margin-top: 10px;
   background: linear-gradient(135deg, rgba(184,148,63,0.15), rgba(184,148,63,0.08));
@@ -415,7 +437,25 @@ body {
   <!-- Result card -->
   <div class="result-card glass hidden" id="resultCard">
     <span class="sect-label">Resultaat</span>
-    <div class="before-after" id="sliderContainer">
+
+    <!-- Option picker — shown while waiting / selecting -->
+    <div id="optionPicker" class="hidden">
+      <span class="sect-label" style="margin-bottom:10px;">Kies een visualisatie</span>
+      <div class="option-grid">
+        <div class="option-thumb" id="optThumb1" onclick="selectOption(1)">
+          <div class="opt-loading" id="optLoad1"><span>Optie 1 wordt gegenereerd...</span></div>
+          <img id="optImg1" class="hidden" alt="Optie 1">
+          <div class="opt-label">Optie 1</div>
+        </div>
+        <div class="option-thumb" id="optThumb2" onclick="selectOption(2)">
+          <div class="opt-loading" id="optLoad2"><span>Optie 2 wordt gegenereerd...</span></div>
+          <img id="optImg2" class="hidden" alt="Optie 2">
+          <div class="opt-label">Optie 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="before-after hidden" id="sliderContainer">
       <div class="ba-placeholder" id="baPlaceholder">
         <i data-lucide="image" style="width:40px;height:40px;color:rgba(255,255,255,0.12);margin-bottom:12px;"></i>
         <span style="font-size:14px;color:rgba(255,255,255,0.2);">Visualisatie verschijnt hier</span>
@@ -426,7 +466,7 @@ body {
       <div class="ba-tag ba-after hidden" id="tagAfter">Na</div>
       <div class="ba-divider hidden" id="baDivider"></div>
       <div class="ba-handle hidden" id="baHandle"><i data-lucide="move-horizontal"></i></div>
-    </div>
+    </div><!-- end sliderContainer -->
     <div class="action-btns">
       <button class="btn-dl" id="btnDownload" type="button"><i data-lucide="download"></i>Download render</button>
       <button class="btn-reset" id="btnReset" type="button"><i data-lucide="rotate-ccw"></i>Nieuw adres</button>
@@ -488,6 +528,8 @@ let featureList = [];
 let selectedFeatureId = null;
 let selectedRenderMode = '3d';
 let rendersCount = 0;
+const editOptions = {};
+let optionsReady = 0;
 let chosenRenderSrc = null;
 let editedSrc = null;
 const renderStore = {};
@@ -615,10 +657,24 @@ function handleStep({ step, status, value }) {
     if (chosenRenderSrc) showLivePreview(chosenRenderSrc, 'Gekozen hoek');
   }
   if (step === 'edit') {
-    setStep('edit', 'done');
-    editedSrc = value;
-    showLivePreview(editedSrc, 'Visualisatie klaar');
-    showResult(chosenRenderSrc, editedSrc);
+    if (status === 'option') {
+      const n = value.option;
+      editOptions[n] = value.image;
+      optionsReady++;
+      const img = document.getElementById(`optImg${n}`);
+      const load = document.getElementById(`optLoad${n}`);
+      img.src = value.image;
+      img.classList.remove('hidden');
+      load.classList.add('hidden');
+      showLivePreview(value.image, `Optie ${n} klaar`);
+      document.getElementById('txt-edit').textContent = `Visualisatie wordt gemaakt... (${optionsReady}/2)`;
+      document.getElementById('resultCard').classList.remove('hidden');
+      document.getElementById('optionPicker').classList.remove('hidden');
+    }
+    if (status === 'done') {
+      setStep('edit', 'done');
+      document.getElementById('txt-edit').textContent = 'Kies een visualisatie';
+    }
   }
 }
 
@@ -705,6 +761,17 @@ function initSlider() {
   container.addEventListener('click', (e) => { if (e.target !== handle) setPos(e.clientX); });
 }
 
+function selectOption(n) {
+  document.querySelectorAll('.option-thumb').forEach(t => t.classList.remove('selected'));
+  document.getElementById(`optThumb${n}`).classList.add('selected');
+  const img = editOptions[n];
+  if (!img) return;
+  editedSrc = img;
+  showResult(chosenRenderSrc, img);
+  document.getElementById('btnEnhance').classList.remove('hidden');
+  lucide.createIcons({ nodes: [document.getElementById('btnEnhance')] });
+}
+
 function showResult(beforeSrc, afterSrc) {
   if (!beforeSrc || !afterSrc) return;
   const beforeSrcFull = beforeSrc.startsWith('data:') ? beforeSrc : `data:image/png;base64,${beforeSrc}`;
@@ -718,8 +785,6 @@ function showResult(beforeSrc, afterSrc) {
     document.getElementById(id).classList.remove('hidden');
   });
   lucide.createIcons({ nodes: [document.getElementById('baHandle')] });
-  document.getElementById('btnEnhance').classList.remove('hidden');
-  lucide.createIcons({ nodes: [document.getElementById('btnEnhance')] });
 }
 
 async function enhance() {
@@ -764,6 +829,16 @@ function download() {
 // Reset
 function reset() {
   document.getElementById('addrInput').value = '';
+  Object.keys(editOptions).forEach(k => delete editOptions[k]);
+  optionsReady = 0;
+  document.getElementById('optionPicker').classList.add('hidden');
+  [1,2].forEach(n => {
+    document.getElementById(`optImg${n}`).classList.add('hidden');
+    document.getElementById(`optImg${n}`).src = '';
+    document.getElementById(`optLoad${n}`).classList.remove('hidden');
+    document.getElementById(`optThumb${n}`).classList.remove('selected');
+  });
+  document.getElementById('sliderContainer').classList.add('hidden');
   const enhBtn = document.getElementById('btnEnhance');
   enhBtn.classList.add('hidden');
   enhBtn.disabled = false;

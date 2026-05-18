@@ -199,9 +199,20 @@ app.post('/run', async (req, res) => {
     const chosenRender = renders.find((item) => item.heading === viewResult.chosen_heading) ?? renders[0];
 
     currentStep = 'edit';
-    const editedB64 = await editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country);
-    writeFileSync(join(outDir, 'edited.png'), Buffer.from(editedB64, 'base64'));
-    emit('step', { step: 'edit', status: 'done', value: `data:image/png;base64,${editedB64}` });
+    const editResults = {};
+    await Promise.all([1, 2].map((n) =>
+      editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country)
+        .then((img) => {
+          editResults[n] = img;
+          writeFileSync(join(outDir, `edited-${n}.png`), Buffer.from(img, 'base64'));
+          emit('step', { step: 'edit', status: 'option', value: { option: n, image: `data:image/png;base64,${img}` } });
+        })
+        .catch((err) => console.warn(`[edit${n}] failed: ${err.message}`))
+    ));
+    if (Object.keys(editResults).length === 0) throw new Error('Both edit attempts failed');
+    const firstResult = editResults[1] ?? editResults[2];
+    writeFileSync(join(outDir, 'edited.png'), Buffer.from(firstResult, 'base64'));
+    emit('step', { step: 'edit', status: 'done' });
 
     currentStep = 'video';
     if (!ENABLE_VIDEO) {
