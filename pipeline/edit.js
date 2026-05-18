@@ -2,7 +2,7 @@ import { orPost } from './utils.js';
 
 export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
   const sizeLine = analysis.pool_size_label
-    ? `This is a ${analysis.pool_size_label}-sized pool — size it accordingly relative to the garden.\n`
+    ? `This is a ${analysis.pool_size_label}-sized pool. The pool must be clearly smaller than the house footprint visible in the image.${analysis.pool_max_dimensions ? ` Do not exceed ${analysis.pool_max_dimensions}m.` : ''}\n`
     : '';
   const terraceStyle = analysis.pool_terrace_style
     ? `${analysis.pool_terrace_style}\n`
