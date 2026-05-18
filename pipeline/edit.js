@@ -14,11 +14,11 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey, count
     ? `\nPOOL POSITION: ${analysis.recommendation}\n`
     : '';
 
-  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY in this image.
+  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY in this aerial image.
 
 TARGET GARDEN IDENTIFICATION — CRITICAL:
-- A small satellite reference inset is visible in the TOP-LEFT CORNER of this image. The TARGET PROPERTY is outlined with a GREEN dashed line in that inset.
-- Find that SAME property in the main aerial image and edit ONLY its garden.
+- The TARGET GARDEN is the garden in the CENTER and FOREGROUND of this image — the camera is aimed directly at it.
+- The TARGET HOUSE is the house immediately behind that garden.
 - DO NOT touch any neighboring garden or property.
 ${positionBlock}
 ${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}

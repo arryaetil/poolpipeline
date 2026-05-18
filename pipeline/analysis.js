@@ -1,19 +1,13 @@
 import { extractJson, orPost } from './utils.js';
 
-export async function analyse(satB64, feature, orKey, poolCatalog = [], country = null, parcel = null) {
+export async function analyse(satB64, feature, orKey, poolCatalog = [], country = null) {
   const catalogSection = poolCatalog.length > 0
     ? `\nAQUAPURA ZWEMBAD CATALOGUS:\n${poolCatalog.map(p => `- ${p.name}: ${p.dimensions_m}m — ${p.ideal_garden}`).join('\n')}\n\nKies het meest geschikte model op basis van de achtertuin. Geef de naam terug als recommended_pool en leg je keuze kort uit in pool_reasoning (Nederlands).`
     : '';
 
   const countryLine = country ? `\nHet adres bevindt zich in: ${country}.\n` : '';
-  const parcelLine = parcel
-    ? `\nOFFICIËLE KADASTERDATA: Het perceel is exact ${parcel.width_m}m breed en ${parcel.depth_m}m diep. Gebruik deze afmetingen — je hoeft ze niet te schatten.\n`
-    : '';
-  const annotationNote = parcel
-    ? `\nDe satellietfoto toont een GROENE STIPPELLIJN die de EXACTE PERCEELGRENS markeert (officiële Kadasterdata). Een ORANJE LIJN toont de woning. Plaats het element uitsluitend BINNEN de groene lijn.\n`
-    : '';
 
-  const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.${countryLine}${parcelLine}${annotationNote}
+  const prompt = `You are a landscape architect. This is a top-down satellite image of a residential property. North is up.${countryLine}
 BELANGRIJK: De VOORKANT van de woning grenst aan de straat/oprit. De TUIN (achtertuin) bevindt zich aan de TEGENOVERGESTELDE zijde — doorgaans omheind, met gras, weg van de straat. Verwar ze nooit.
 
 1. Identificeer aan welke kompaszijde de VOORKANT van de woning ligt (straat/oprit).

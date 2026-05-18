@@ -9,7 +9,6 @@ import { geocode } from './pipeline/geocode.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
-import { fetchParcel, fetchBuilding, annotateImage, compositeRenderWithSatellite, gardenCentroid } from './pipeline/parcel.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage } from './pipeline/edit.js';
 import { generateVideo } from './pipeline/video.js';
@@ -19,7 +18,6 @@ const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
-const BAG_KEY = process.env.BAG_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const ENABLE_VIDEO = process.env.ENABLE_VIDEO === 'true';
@@ -140,34 +138,12 @@ app.post('/run', async (req, res) => {
     writeFileSync(join(outDir, 'satellite.png'), Buffer.from(satB64, 'base64'));
     emit('step', { step: 'satellite', status: 'done', value: `data:image/png;base64,${satB64}` });
 
-    // Parcel + building lookup (NL + BE — degrades gracefully for other countries)
-    let parcel = null;
-    let renderLat = geo.lat;
-    let renderLng = geo.lng;
-    let renderRange = feature.camera_range;
-    let satForAnalysis = satB64;
-    try {
-      parcel = await fetchParcel(geo.lat, geo.lng, geo.country);
-      const building = await fetchBuilding(geo.lat, geo.lng, BAG_KEY, geo.country);
-      satForAnalysis = await annotateImage(satB64, parcel, building, geo.lat, geo.lng);
-      writeFileSync(join(outDir, 'satellite-annotated.png'), Buffer.from(satForAnalysis, 'base64'));
-      emit('step', { step: 'satellite', status: 'annotated', value: `data:image/png;base64,${satForAnalysis}` });
-      const target = building ? gardenCentroid(parcel.coords, building) : parcel.centroid;
-      renderLat = target.lat;
-      renderLng = target.lng;
-      renderRange = parcel.range;
-      console.log(`[parcel] ${parcel.width_m}m × ${parcel.depth_m}m → target ${renderLat.toFixed(6)},${renderLng.toFixed(6)} range=${renderRange}m${building ? ' (garden centroid)' : ' (parcel centroid)'}`);
-    } catch (err) {
-      console.warn('[parcel] lookup failed, using geocoded point:', err.message);
-    }
-
     currentStep = 'analysis';
-    const analysis = await analyse(satForAnalysis, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : [], geo.country, parcel);
+    const analysis = await analyse(satB64, feature, OR_KEY, feature.id === 'pool' ? poolCatalog : [], geo.country);
     if (feature.id === 'pool' && analysis.recommended_pool) {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
       if (matched) {
         analysis.pool_dimensions = matched.dimensions_m;
-        // Build terrace style from analysis material choice + model furniture
         const materialMap = {
           'arduin':             'dark grey natural stone arduin (bluestone) slabs',
           'composiet':          'grey-brown composite wood-look decking boards',
@@ -190,10 +166,10 @@ app.post('/run', async (req, res) => {
     currentStep = 'renders';
     const renderFn = renderMode === '2d' ? renderMapbox : renderAll;
     const renders = await renderFn({
-      lat: renderLat,
-      lng: renderLng,
+      lat: geo.lat,
+      lng: geo.lng,
       pitch: feature.camera_pitch,
-      range: renderRange,
+      range: feature.camera_range,
       backyardHeading: analysis.backyard_camera_heading ?? null,
       mapboxToken: MAPBOX_TOKEN,
       ionToken: CESIUM_ION_TOKEN,
@@ -216,12 +192,9 @@ app.post('/run', async (req, res) => {
     writeFileSync(join(outDir, 'chosen.json'), JSON.stringify({ heading: viewResult.chosen_heading, reason: viewResult.reason }, null, 2));
 
     const chosenRender = renders.find((item) => item.heading === viewResult.chosen_heading) ?? renders[0];
-    const renderForEdit = satForAnalysis !== satB64
-      ? await compositeRenderWithSatellite(chosenRender.image, satForAnalysis)
-      : chosenRender.image;
 
     currentStep = 'edit';
-    const editedB64 = await editImage(renderForEdit, feature, analysis, OR_KEY, geo.country);
+    const editedB64 = await editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country);
     writeFileSync(join(outDir, 'edited.png'), Buffer.from(editedB64, 'base64'));
     emit('step', { step: 'edit', status: 'done', value: `data:image/png;base64,${editedB64}` });
 
