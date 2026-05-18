@@ -160,10 +160,7 @@ app.post('/run', async (req, res) => {
         const furniture = matched.terrace_style.includes('sunlounger')
           ? matched.terrace_style.split(',').filter(s => s.includes('lounger')).join(',').trim()
           : '2 white minimal sunloungers';
-        const covrex = matched.id.startsWith('la_plage') || ['zenn','city','city_plus','style','carre','xl','xl_plus'].includes(matched.id)
-          ? ' An anthracite Covrex rolluik (automatic pool cover) sits partially retracted at one short end of the pool.'
-          : '';
-        analysis.pool_terrace_style = `${material} surrounding the pool flush with the coping. ${furniture}.${covrex}`;
+        analysis.pool_terrace_style = `${material} surrounding the pool flush with the coping. ${furniture}.`;
       }
     }
     writeFileSync(join(outDir, 'analysis.json'), JSON.stringify(analysis, null, 2));
