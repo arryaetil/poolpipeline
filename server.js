@@ -155,7 +155,7 @@ app.post('/run', async (req, res) => {
     if (feature.id === 'pool' && analysis.recommended_pool) {
       const matched = poolCatalog.find((p) => p.name === analysis.recommended_pool);
       if (matched) {
-        analysis.pool_dimensions = matched.dimensions_m;
+        analysis.pool_size_label = matched.size_label;
         const material = 'dark grey natural stone arduin (bluestone) slabs';
         const furniture = matched.terrace_style.includes('sunlounger')
           ? matched.terrace_style.split(',').filter(s => s.includes('lounger')).join(',').trim()

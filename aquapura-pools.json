@@ -2,6 +2,7 @@
   {
     "id": "city",
     "name": "City",
+    "size_label": "small",
     "dimensions_m": "7.0 × 3.0",
     "shape": "rectangular",
     "depth_range_m": "1.20–1.45",
@@ -11,6 +12,7 @@
   {
     "id": "zenn",
     "name": "Zenn",
+    "size_label": "medium",
     "dimensions_m": "8.6 × 3.5",
     "shape": "rectangular",
     "depth_range_m": "1.20–1.50",
@@ -20,6 +22,7 @@
   {
     "id": "xl",
     "name": "XL",
+    "size_label": "large",
     "dimensions_m": "10.0 × 4.0",
     "shape": "rectangular",
     "depth_range_m": "1.35–1.65",
@@ -29,6 +32,7 @@
   {
     "id": "carre",
     "name": "Carré",
+    "size_label": "medium",
     "dimensions_m": "6.0 × 6.0",
     "shape": "square",
     "depth_range_m": "1.40–1.50",
@@ -38,6 +42,7 @@
   {
     "id": "la_plage_10",
     "name": "La Plage 10",
+    "size_label": "large",
     "dimensions_m": "10.0 × 4.5",
     "shape": "rectangular with full-width beach entry",
     "depth_range_m": "0.0 beach / 1.50 deep",

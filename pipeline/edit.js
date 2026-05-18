@@ -1,8 +1,8 @@
 import { orPost } from './utils.js';
 
 export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
-  const dimensionsLine = analysis.pool_dimensions
-    ? `Pool dimensions: ${analysis.pool_dimensions}m.\n`
+  const sizeLine = analysis.pool_size_label
+    ? `This is a ${analysis.pool_size_label}-sized pool — size it accordingly relative to the garden.\n`
     : '';
   const terraceStyle = analysis.pool_terrace_style
     ? `${analysis.pool_terrace_style}\n`
@@ -21,7 +21,7 @@ HOW TO IDENTIFY THE CORRECT SPOT:
 - Place the pool ONLY in the foreground grass/lawn area. NEVER between the house and any road/driveway in the background. NEVER on a neighbour's lot.
 
 The pool must be strictly rectangular — no curved or round shapes.
-${dimensionsLine}${renderPrompt}${terraceStyle}
+${sizeLine}${renderPrompt}${terraceStyle}
 Keep the rest of the image pixel-identical — same house, roof, windows, trees, driveway, neighbours, fences, camera angle, lighting, and shadows. Match the existing perspective and lighting direction. Do not change framing, zoom, or camera angle.`;
 
   const models = [
