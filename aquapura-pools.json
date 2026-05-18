@@ -1,30 +1,21 @@
 [
   {
+    "id": "city",
+    "name": "City",
+    "dimensions_m": "7.0 × 3.0",
+    "shape": "rectangular",
+    "depth_range_m": "1.20–1.45",
+    "ideal_garden": "compact urban garden; smaller footprint",
+    "terrace_style": "sleek minimal grey stone terrace flush with coping, clean lines, no furniture"
+  },
+  {
     "id": "zenn",
     "name": "Zenn",
     "dimensions_m": "8.6 × 3.5",
     "shape": "rectangular",
     "depth_range_m": "1.20–1.50",
     "ideal_garden": "medium backyard with room for terracing; versatile all-rounder",
-    "terrace_style": "large grey Belgian bluestone slabs flush with pool coping on all sides, 2 white minimal sunloungers on the long side"
-  },
-  {
-    "id": "city",
-    "name": "City",
-    "dimensions_m": "7.0 × 3.0",
-    "shape": "rectangular",
-    "depth_range_m": "1.20–1.45",
-    "ideal_garden": "compact urban garden or terrace; smaller footprint",
-    "terrace_style": "sleek minimal grey stone terrace flush with coping, clean lines, no furniture"
-  },
-  {
-    "id": "city_plus",
-    "name": "City+",
-    "dimensions_m": "8.0 × 3.5",
-    "shape": "rectangular",
-    "depth_range_m": "1.20–1.50",
-    "ideal_garden": "medium urban garden wanting extra length over City",
-    "terrace_style": "grey stone slabs surrounding the pool, 2 white sunloungers on the long side"
+    "terrace_style": "grey Belgian bluestone slabs flush with pool coping on all sides, 2 white minimal sunloungers on the long side"
   },
   {
     "id": "xl",
@@ -33,25 +24,7 @@
     "shape": "rectangular",
     "depth_range_m": "1.35–1.65",
     "ideal_garden": "spacious suburban backyard; families wanting lap lane",
-    "terrace_style": "grey stone slabs on two sides, warm composite wood deck boards on the long sunny side, 2–3 white sunloungers"
-  },
-  {
-    "id": "xl_plus",
-    "name": "XL+",
-    "dimensions_m": "11.0 × 4.5",
-    "shape": "rectangular",
-    "depth_range_m": "1.40–1.70",
-    "ideal_garden": "large garden; premium lap pool; maximum swim length",
-    "terrace_style": "wide grey stone terrace on all sides with composite wood deck on the long side, 3 white sunloungers with towels, premium finish"
-  },
-  {
-    "id": "style",
-    "name": "Style",
-    "dimensions_m": "9.0 × 4.0",
-    "shape": "rectangular with shallow shelf",
-    "depth_range_m": "0.30 shelf / 1.45 main",
-    "ideal_garden": "family garden with children; shallow relaxation shelf at one end",
-    "terrace_style": "grey bluestone slabs surrounding pool, 2 white sunloungers, shallow shelf visible at one end of the pool"
+    "terrace_style": "grey stone slabs on all sides, 2–3 white sunloungers on the long sunny side"
   },
   {
     "id": "carre",
@@ -59,26 +32,8 @@
     "dimensions_m": "6.0 × 6.0",
     "shape": "square",
     "depth_range_m": "1.40–1.50",
-    "ideal_garden": "near-square or wide garden; contemporary geometric design statement",
-    "terrace_style": "warm exotic ipé hardwood deck surrounding the square pool on all sides, 2 white sunloungers, bold geometric statement"
-  },
-  {
-    "id": "zk12",
-    "name": "ZK12",
-    "dimensions_m": "12.0 × 4.0",
-    "shape": "rectangular",
-    "depth_range_m": "1.45–1.70",
-    "ideal_garden": "very long garden; competition or serious lap swimming",
-    "terrace_style": "minimal flat grey stone coping flush with terrace, clean industrial look, no furniture, straight lap pool aesthetic"
-  },
-  {
-    "id": "la_plage_9",
-    "name": "La Plage 9",
-    "dimensions_m": "9.0 × 4.5",
-    "shape": "rectangular with full-width beach entry",
-    "depth_range_m": "0.0 beach / 1.50 deep",
-    "ideal_garden": "medium-large garden; beach/resort feel; gentle walk-in entry",
-    "terrace_style": "warm ipé hardwood deck on the long sides, beach entry slope visible at one short end gradually going from deck level into the water, 2 white sunloungers"
+    "ideal_garden": "near-square or wide garden; contemporary geometric statement",
+    "terrace_style": "grey Belgian bluestone slabs surrounding the square pool on all sides, 2 white sunloungers"
   },
   {
     "id": "la_plage_10",
@@ -86,25 +41,7 @@
     "dimensions_m": "10.0 × 4.5",
     "shape": "rectangular with full-width beach entry",
     "depth_range_m": "0.0 beach / 1.50 deep",
-    "ideal_garden": "large garden; beach entry; extra swim length",
-    "terrace_style": "warm ipé hardwood deck on long sides, beach entry at one end, 2–3 white sunloungers, resort atmosphere"
-  },
-  {
-    "id": "la_plage_11",
-    "name": "La Plage 11",
-    "dimensions_m": "11.0 × 5.0",
-    "shape": "rectangular with full-width beach entry",
-    "depth_range_m": "0.0 beach / 1.55 deep",
-    "ideal_garden": "very large garden; premium resort aesthetic; families",
-    "terrace_style": "wide ipé hardwood deck surrounding pool, beach entry at one end, 3 premium white sunloungers with towels, lush resort feel"
-  },
-  {
-    "id": "la_plage_12",
-    "name": "La Plage 12",
-    "dimensions_m": "12.0 × 5.0",
-    "shape": "rectangular with full-width beach entry",
-    "depth_range_m": "0.0 beach / 1.60 deep",
-    "ideal_garden": "maximum garden space; ultimate resort pool; statement centrepiece",
-    "terrace_style": "expansive ipé hardwood deck on all sides, beach entry at one end, 3–4 premium white sunloungers, ultimate resort statement"
+    "ideal_garden": "large garden; beach/resort feel; gentle walk-in entry",
+    "terrace_style": "grey stone slabs on long sides, beach entry slope at one short end gradually merging from terrace into the water, 2–3 white sunloungers"
   }
 ]

@@ -4,6 +4,9 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey) {
   const positionBlock = analysis.recommendation
     ? `\nPOOL POSITION: ${analysis.recommendation}\n`
     : '';
+  const dimensionsLine = analysis.pool_dimensions
+    ? `Pool dimensions: ${analysis.pool_dimensions}m — scale accordingly.\n`
+    : '';
 
   const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY in this aerial image.
 
@@ -12,7 +15,7 @@ TARGET GARDEN IDENTIFICATION — CRITICAL:
 - The TARGET HOUSE is the house immediately behind that garden.
 - DO NOT touch any neighboring garden or property.
 ${positionBlock}
-${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
+${dimensionsLine}${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
 
 STRICT RULES:
 - Add ONLY the swimming pool and its immediate terrace. Nothing else.
