@@ -18,11 +18,6 @@ BELANGRIJK: De VOORKANT van de woning grenst aan de straat/oprit. De TUIN (achte
 6. Bepaal de kompasrichting VAN het midden van de woning NAAR de achtertuin (0–360°, 0=N, 90=O, 180=Z, 270=W).
 ${catalogSection}
 
-TERRAS MATERIAAL: Bekijk de stijl van de woning en de bestaande tuin. Kies het meest passende terrasmateriaal rondom het zwembad uit deze Aquapura opties:
-- "arduin" — blauwesteen tegels, donkergrijs natuursteen (past bij klassieke, landelijke of traditionele woningen)
-- "composiet" — composiet houtlook vlonderplanken, grijsbruin (past bij moderne en eigentijdse woningen)
-- "keramische tegels" — grote lichtgrijze keramische tegels (past bij ultra-moderne of minimalistische woningen)
-
 Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
 {
   "front_side": "...",
@@ -33,8 +28,6 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
   "recommendation": "...",
   "recommended_pool": "...",
   "pool_reasoning": "...",
-  "terrace_material": "arduin|composiet|keramische tegels",
-  "terrace_reasoning": "...",
   "render_prompt": "...",
   "backyard_camera_heading": <number>
 }`;
