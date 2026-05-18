@@ -1,6 +1,7 @@
 import { orPost } from './utils.js';
 
-export async function editImage(chosenRenderB64, feature, analysis, orKey) {
+export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
+  const countryLabel = country === 'België' || country === 'Belgium' ? 'Belgian' : country === 'Nederland' ? 'Dutch' : '';
   const positionBlock = analysis.recommendation
     ? `\nPOOL POSITION: ${analysis.recommendation}\n`
     : '';
@@ -8,29 +9,31 @@ export async function editImage(chosenRenderB64, feature, analysis, orKey) {
     ? `Pool dimensions: ${analysis.pool_dimensions}m — scale accordingly.\n`
     : '';
 
-  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET PROPERTY in this aerial image.
+  const prompt = `Add a realistic ${(feature.label_en ?? feature.label).toLowerCase()} to the TARGET HOUSE in this oblique aerial photo.
 
-TARGET GARDEN IDENTIFICATION — CRITICAL:
-- The TARGET GARDEN is the garden in the CENTER and FOREGROUND of this image — the camera is aimed directly at it.
-- The TARGET HOUSE is the house immediately behind that garden.
-- DO NOT touch any neighboring garden or property.
+TARGET HOUSE IDENTIFICATION — CRITICAL:
+- The camera is aimed directly at the TARGET garden — it occupies the CENTER of this image.
+- The TARGET HOUSE is the house immediately behind that central garden area.
+- DO NOT touch, modify, or add anything to any neighboring house or garden visible in the image.
+- If you are unsure which garden is the target, use the garden closest to the exact center of the image.
 ${positionBlock}
 ${dimensionsLine}${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
+${analysis.render_prompt ? analysis.render_prompt : ''}
 
-STRICT RULES:
+STRICT RULES — do not break these:
 - Add ONLY the swimming pool and its immediate terrace. Nothing else.
-- Do NOT add trees, plants, shrubs, or any vegetation.
+- Do NOT add trees, plants, shrubs, or any vegetation anywhere in the image.
 - Do NOT modify the house, roof, walls, windows, or driveway.
-- Do NOT modify neighboring properties.
+- Do NOT modify neighboring properties in any way.
 - Do NOT change the framing, zoom level, or camera angle.
-- Do NOT change the color or texture of any grass or lawn outside the terrace.
+- Do NOT change the color, brightness, or texture of any grass or lawn — the grass outside the terrace must be pixel-perfect identical to the original.
 - Keep every pixel outside the pool and terrace area identical to the original.
-- Match the visual style of the input image exactly.`;
+- This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
 
   const models = [
-    'google/gemini-2.5-flash-image',
-    'google/gemini-3.1-flash-image-preview',
     'google/gemini-3-pro-image-preview',
+    'google/gemini-3.1-flash-image-preview',
+    'google/gemini-2.5-flash-image',
   ];
   const body = (model) => ({
     model,
@@ -50,7 +53,7 @@ STRICT RULES:
       const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, body(model), 180000);
       const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
       if (!imgUrl) {
-        console.warn(`[edit] ${model} returned no image, full response:`, JSON.stringify(data).slice(0, 500));
+        console.warn(`[edit] ${model} returned no image:`, JSON.stringify(data).slice(0, 500));
         throw new Error('No image in response');
       }
       console.log(`[edit] success with ${model}`);
