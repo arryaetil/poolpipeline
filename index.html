@@ -443,14 +443,24 @@ body {
       <span class="sect-label" style="margin-bottom:10px;">Kies een visualisatie</span>
       <div class="option-grid">
         <div class="option-thumb" id="optThumb1" onclick="selectOption(1)">
-          <div class="opt-loading" id="optLoad1"><span>Optie 1 wordt gegenereerd...</span></div>
+          <div class="opt-loading" id="optLoad1"><span>Wordt gegenereerd...</span></div>
           <img id="optImg1" class="hidden" alt="Optie 1">
           <div class="opt-label">Optie 1</div>
         </div>
         <div class="option-thumb" id="optThumb2" onclick="selectOption(2)">
-          <div class="opt-loading" id="optLoad2"><span>Optie 2 wordt gegenereerd...</span></div>
+          <div class="opt-loading" id="optLoad2"><span>Wordt gegenereerd...</span></div>
           <img id="optImg2" class="hidden" alt="Optie 2">
           <div class="opt-label">Optie 2</div>
+        </div>
+        <div class="option-thumb" id="optThumb3" onclick="selectOption(3)">
+          <div class="opt-loading" id="optLoad3"><span>Wordt gegenereerd...</span></div>
+          <img id="optImg3" class="hidden" alt="Optie 3">
+          <div class="opt-label">Optie 3</div>
+        </div>
+        <div class="option-thumb" id="optThumb4" onclick="selectOption(4)">
+          <div class="opt-loading" id="optLoad4"><span>Wordt gegenereerd...</span></div>
+          <img id="optImg4" class="hidden" alt="Optie 4">
+          <div class="opt-label">Optie 4</div>
         </div>
       </div>
     </div>
@@ -667,7 +677,7 @@ function handleStep({ step, status, value }) {
       img.classList.remove('hidden');
       load.classList.add('hidden');
       showLivePreview(value.image, `Optie ${n} klaar`);
-      document.getElementById('txt-edit').textContent = `Visualisatie wordt gemaakt... (${optionsReady}/2)`;
+      document.getElementById('txt-edit').textContent = `Visualisatie wordt gemaakt... (${optionsReady}/4)`;
       document.getElementById('resultCard').classList.remove('hidden');
       document.getElementById('optionPicker').classList.remove('hidden');
     }
@@ -837,7 +847,7 @@ function reset() {
   Object.keys(editOptions).forEach(k => delete editOptions[k]);
   optionsReady = 0;
   document.getElementById('optionPicker').classList.add('hidden');
-  [1,2].forEach(n => {
+  [1,2,3,4].forEach(n => {
     document.getElementById(`optImg${n}`).classList.add('hidden');
     document.getElementById(`optImg${n}`).src = '';
     document.getElementById(`optLoad${n}`).classList.remove('hidden');

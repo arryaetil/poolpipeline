@@ -200,7 +200,7 @@ app.post('/run', async (req, res) => {
 
     currentStep = 'edit';
     const editResults = {};
-    await Promise.all([1, 2].map((n) =>
+    await Promise.all([1, 2, 3, 4].map((n) =>
       editImage(chosenRender.image, feature, analysis, OR_KEY, geo.country)
         .then((img) => {
           editResults[n] = img;
