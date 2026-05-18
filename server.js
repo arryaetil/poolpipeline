@@ -147,7 +147,6 @@ app.post('/run', async (req, res) => {
         const materialMap = {
           'arduin':             'dark grey natural stone arduin (bluestone) slabs',
           'composiet':          'grey-brown composite wood-look decking boards',
-          'tropisch hardhout':  'warm natural ipé tropical hardwood deck',
           'keramische tegels':  'large light grey ceramic tiles',
         };
         const material = materialMap[analysis.terrace_material] || materialMap['arduin'];

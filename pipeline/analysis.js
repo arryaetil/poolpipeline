@@ -21,7 +21,6 @@ ${catalogSection}
 TERRAS MATERIAAL: Bekijk de stijl van de woning en de bestaande tuin. Kies het meest passende terrasmateriaal rondom het zwembad uit deze Aquapura opties:
 - "arduin" — blauwesteen tegels, donkergrijs natuursteen (past bij klassieke, landelijke of traditionele woningen)
 - "composiet" — composiet houtlook vlonderplanken, grijsbruin (past bij moderne en eigentijdse woningen)
-- "tropisch hardhout" — naturel ipé of bangkirai hardhouten vlonder, warme bruine tint (past bij woningen met warm karakter of bestaande houten elementen)
 - "keramische tegels" — grote lichtgrijze keramische tegels (past bij ultra-moderne of minimalistische woningen)
 
 Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
@@ -34,7 +33,7 @@ Antwoord UITSLUITEND in JSON, alle tekstwaarden in het Nederlands:
   "recommendation": "...",
   "recommended_pool": "...",
   "pool_reasoning": "...",
-  "terrace_material": "arduin|composiet|tropisch hardhout|keramische tegels",
+  "terrace_material": "arduin|composiet|keramische tegels",
   "terrace_reasoning": "...",
   "render_prompt": "...",
   "backyard_camera_heading": <number>

@@ -1,15 +1,6 @@
 import { orPost } from './utils.js';
 
-function poolScaleHint(analysis) {
-  if (!analysis.pool_dimensions || !analysis.backyard_depth_m || !analysis.backyard_width_m) return '';
-  const [poolLength, poolWidth] = analysis.pool_dimensions.split('×').map((s) => parseFloat(s.trim()));
-  const depthPct = Math.round((poolLength / analysis.backyard_depth_m) * 100);
-  const widthPct = Math.round((poolWidth / analysis.backyard_width_m) * 100);
-  return ` The pool should occupy approximately ${depthPct}% of the visible lawn depth and ${widthPct}% of the lawn width — no larger.`;
-}
-
-export async function editImage(chosenRenderB64, feature, analysis, orKey, country = null) {
-  const countryLabel = country === 'België' || country === 'Belgium' ? 'Belgian' : country === 'Nederland' ? 'Dutch' : '';
+export async function editImage(chosenRenderB64, feature, analysis, orKey) {
   const positionBlock = analysis.recommendation
     ? `\nPOOL POSITION: ${analysis.recommendation}\n`
     : '';
@@ -21,19 +12,17 @@ TARGET GARDEN IDENTIFICATION — CRITICAL:
 - The TARGET HOUSE is the house immediately behind that garden.
 - DO NOT touch any neighboring garden or property.
 ${positionBlock}
-${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}${poolScaleHint(analysis)}
-${analysis.render_prompt}
+${feature.edit_prompt}${analysis.pool_terrace_style ? ` Terrace and surroundings: ${analysis.pool_terrace_style}.` : ''}
 
-STRICT RULES — do not break these:
+STRICT RULES:
 - Add ONLY the swimming pool and its immediate terrace. Nothing else.
-- Do NOT add trees, plants, shrubs, or any vegetation anywhere in the image.
+- Do NOT add trees, plants, shrubs, or any vegetation.
 - Do NOT modify the house, roof, walls, windows, or driveway.
-- Do NOT modify neighboring properties in any way.
+- Do NOT modify neighboring properties.
 - Do NOT change the framing, zoom level, or camera angle.
-- Do NOT change the color, brightness, or texture of any grass or lawn — the grass outside the terrace must be pixel-perfect identical to the original.
+- Do NOT change the color or texture of any grass or lawn outside the terrace.
 - Keep every pixel outside the pool and terrace area identical to the original.
-- Remove the satellite inset from the top-left corner in your output.
-- This is${countryLabel ? ` a ${countryLabel} residential property.` : ' a residential property.'} Match the visual style of the input image exactly — whether photorealistic 3D render or 2D satellite.`;
+- Match the visual style of the input image exactly.`;
 
   const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
     model: 'google/gemini-3-pro-image-preview',
