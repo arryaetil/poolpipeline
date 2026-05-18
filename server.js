@@ -11,7 +11,6 @@ import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
 import { selectView } from './pipeline/viewSelect.js';
 import { editImage, enhanceImage } from './pipeline/edit.js';
-import { generateVideo } from './pipeline/video.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
@@ -20,7 +19,6 @@ const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
-const ENABLE_VIDEO = process.env.ENABLE_VIDEO === 'true';
 
 const features = loadFeatures();
 const poolCatalog = JSON.parse(
@@ -211,19 +209,6 @@ app.post('/run', async (req, res) => {
     const firstResult = editResults[1] ?? editResults[2];
     writeFileSync(join(outDir, 'edited.png'), Buffer.from(firstResult, 'base64'));
     emit('step', { step: 'edit', status: 'done' });
-
-    currentStep = 'video';
-    if (!ENABLE_VIDEO) {
-      emit('step', {
-        step: 'video',
-        status: 'skipped',
-        value: { reason: 'Video generation is disabled for demo mode.' },
-      });
-    } else {
-      const videoPath = join(outDir, 'hero.mp4');
-      await generateVideo(editedB64, feature, analysis, videoPath, OR_KEY);
-      emit('step', { step: 'video', status: 'done', value: `/output/${slug}/hero.mp4` });
-    }
 
     emit('done', {});
   } catch (err) {
