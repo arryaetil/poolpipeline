@@ -73,7 +73,7 @@ export async function enhanceImage(imageB64, orKey) {
     messages: [{
       role: 'user',
       content: [
-        { type: 'text', text: 'Transform this aerial image into a professional high-end real estate drone photo. Add warm golden-hour sunlight with soft directional shadows. Make all vegetation — trees, grass, hedges — rich, lush and vibrant. Enhance contrast, color depth and overall atmosphere so it feels like a premium real estate listing shot on a beautiful summer evening. Keep every element exactly in place: same buildings, same pool, same garden layout, same camera angle. Only improve lighting, atmosphere and visual quality.' },
+        { type: 'text', text: 'Enhance the lighting and atmosphere of this aerial image to look like a professional real estate drone photo taken during golden hour. Add warm sunlight with soft directional shadows. Make vegetation — trees, grass, hedges — richer and more vibrant. CRITICAL: Do NOT add, remove, or move any buildings, roads, pools, gardens, cars, or any other element. Do NOT invent new structures or features. Every building, garden, pool and road must remain in exactly the same position, shape and size. Only the lighting, color grading and visual atmosphere may change.' },
         { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageB64}` } },
       ],
     }],
