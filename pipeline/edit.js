@@ -24,8 +24,9 @@ STRICT RULES:
 - Keep every pixel outside the pool and terrace area identical to the original.
 - Match the visual style of the input image exactly.`;
 
-  const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, {
-    model: 'google/gemini-3-pro-image-preview',
+  const models = ['google/gemini-3-pro-image-preview', 'google/gemini-3.1-flash-image-preview'];
+  const body = (model) => ({
+    model,
     messages: [{
       role: 'user',
       content: [
@@ -34,9 +35,23 @@ STRICT RULES:
       ],
     }],
     modalities: ['image', 'text'],
-  }, 180000);
+  });
 
-  const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
-  if (!imgUrl) throw new Error('No image returned from Nano Banana Pro');
-  return imgUrl.replace(/^data:image\/\w+;base64,/, '');
+  let lastErr;
+  for (const model of models) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const data = await orPost('https://openrouter.ai/api/v1/chat/completions', orKey, body(model), 180000);
+        const imgUrl = data.choices[0].message.images?.[0]?.image_url?.url;
+        if (!imgUrl) throw new Error('No image in response');
+        console.log(`[edit] success with ${model} (attempt ${attempt})`);
+        return imgUrl.replace(/^data:image\/\w+;base64,/, '');
+      } catch (err) {
+        lastErr = err;
+        console.warn(`[edit] ${model} attempt ${attempt} failed: ${err.message}`);
+        if (attempt < 2) await new Promise(r => setTimeout(r, 5000));
+      }
+    }
+  }
+  throw new Error(`Image edit failed after all retries: ${lastErr.message}`);
 }
