@@ -4,49 +4,23 @@
     "name": "City",
     "size_label": "small",
     "dimensions_m": "7.0 × 3.0",
-    "shape": "rectangular",
-    "depth_range_m": "1.20–1.45",
-    "ideal_garden": "compact urban garden; smaller footprint",
-    "terrace_style": "sleek minimal grey stone terrace flush with coping, clean lines, no furniture"
+    "ideal_garden": "compact urban garden up to roughly 10m deep",
+    "terrace_style": "sleek minimal grey arduin stone terrace flush with coping, clean lines, no furniture"
   },
   {
     "id": "zenn",
     "name": "Zenn",
     "size_label": "medium",
     "dimensions_m": "8.6 × 3.5",
-    "shape": "rectangular",
-    "depth_range_m": "1.20–1.50",
-    "ideal_garden": "medium backyard with room for terracing; versatile all-rounder",
-    "terrace_style": "grey Belgian bluestone slabs flush with pool coping on all sides, 2 white minimal sunloungers on the long side"
+    "ideal_garden": "medium backyard roughly 10–20m deep",
+    "terrace_style": "grey Belgian arduin bluestone slabs flush with pool coping on all sides, 2 white minimal sunloungers on the long side"
   },
   {
     "id": "xl",
     "name": "XL",
     "size_label": "large",
     "dimensions_m": "10.0 × 4.0",
-    "shape": "rectangular",
-    "depth_range_m": "1.35–1.65",
-    "ideal_garden": "spacious suburban backyard; families wanting lap lane",
-    "terrace_style": "grey stone slabs on all sides, 2–3 white sunloungers on the long sunny side"
-  },
-  {
-    "id": "carre",
-    "name": "Carré",
-    "size_label": "medium",
-    "dimensions_m": "6.0 × 6.0",
-    "shape": "square",
-    "depth_range_m": "1.40–1.50",
-    "ideal_garden": "near-square or wide garden; contemporary geometric statement",
-    "terrace_style": "grey Belgian bluestone slabs surrounding the square pool on all sides, 2 white sunloungers"
-  },
-  {
-    "id": "la_plage_10",
-    "name": "La Plage 10",
-    "size_label": "large",
-    "dimensions_m": "10.0 × 4.5",
-    "shape": "rectangular with full-width beach entry",
-    "depth_range_m": "0.0 beach / 1.50 deep",
-    "ideal_garden": "large garden; beach/resort feel; gentle walk-in entry",
-    "terrace_style": "grey stone slabs on long sides, beach entry slope at one short end gradually merging from terrace into the water, 2–3 white sunloungers"
+    "ideal_garden": "spacious backyard 20m deep or more",
+    "terrace_style": "grey arduin stone slabs on all sides, 2–3 white sunloungers on the long sunny side"
   }
 ]

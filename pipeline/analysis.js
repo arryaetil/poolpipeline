@@ -2,7 +2,7 @@ import { extractJson, orPost } from './utils.js';
 
 export async function analyse(satB64, feature, orKey, poolCatalog = [], country = null) {
   const catalogSection = poolCatalog.length > 0
-    ? `\nAQUAPURA ZWEMBAD CATALOGUS:\n${poolCatalog.map(p => `- ${p.name}: ${p.dimensions_m}m — ${p.ideal_garden}`).join('\n')}\n\nKies het meest geschikte model op basis van de achtertuin. Geef de naam terug als recommended_pool en leg je keuze kort uit in pool_reasoning (Nederlands).`
+    ? `\nAQUAPURA ZWEMBAD MODELLEN (kies op basis van beschikbare tuinruimte):\n- City (small): ${poolCatalog.find(p=>p.id==='city')?.ideal_garden}\n- Zenn (medium): ${poolCatalog.find(p=>p.id==='zenn')?.ideal_garden}\n- XL (large): ${poolCatalog.find(p=>p.id==='xl')?.ideal_garden}\n\nKies het passende model. Geef de naam terug als recommended_pool en leg je keuze kort uit in pool_reasoning (Nederlands).`
     : '';
 
   const countryLine = country ? `\nHet adres bevindt zich in: ${country}.\n` : '';
