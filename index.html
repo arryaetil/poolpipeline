@@ -467,7 +467,7 @@ body {
       <div class="ba-divider hidden" id="baDivider"></div>
       <div class="ba-handle hidden" id="baHandle"><i data-lucide="move-horizontal"></i></div>
     </div><!-- end sliderContainer -->
-    <div class="action-btns">
+    <div class="action-btns hidden" id="resultActions">
       <button class="btn-dl" id="btnDownload" type="button"><i data-lucide="download"></i>Download render</button>
       <button class="btn-reset" id="btnReset" type="button"><i data-lucide="rotate-ccw"></i>Nieuw adres</button>
     </div>
@@ -768,22 +768,27 @@ function selectOption(n) {
   if (!img) return;
   editedSrc = img;
   showResult(chosenRenderSrc, img);
+  document.getElementById('resultActions').classList.remove('hidden');
   document.getElementById('btnEnhance').classList.remove('hidden');
   lucide.createIcons({ nodes: [document.getElementById('btnEnhance')] });
 }
 
 function showResult(beforeSrc, afterSrc) {
-  if (!beforeSrc || !afterSrc) return;
-  const beforeSrcFull = beforeSrc.startsWith('data:') ? beforeSrc : `data:image/png;base64,${beforeSrc}`;
-  document.getElementById('imgBefore').src = beforeSrcFull;
+  if (!afterSrc) return;
+  const beforeSrcFull = beforeSrc
+    ? (beforeSrc.startsWith('data:') ? beforeSrc : `data:image/png;base64,${beforeSrc}`)
+    : null;
+  if (beforeSrcFull) document.getElementById('imgBefore').src = beforeSrcFull;
   document.getElementById('imgAfter').src = afterSrc;
   document.getElementById('imgAfter').style.clipPath = 'inset(0 0 0 50%)';
   document.getElementById('baHandle').style.left = '50%';
   document.getElementById('baDivider').style.left = '50%';
   document.getElementById('baPlaceholder').classList.add('hidden');
-  ['imgBefore','imgAfter','tagBefore','tagAfter','baDivider','baHandle'].forEach(id => {
-    document.getElementById(id).classList.remove('hidden');
-  });
+  document.getElementById('sliderContainer').classList.remove('hidden');
+  const ids = beforeSrcFull
+    ? ['imgBefore','imgAfter','tagBefore','tagAfter','baDivider','baHandle']
+    : ['imgAfter','tagAfter','baDivider','baHandle'];
+  ids.forEach(id => document.getElementById(id).classList.remove('hidden'));
   lucide.createIcons({ nodes: [document.getElementById('baHandle')] });
 }
 
@@ -839,6 +844,9 @@ function reset() {
     document.getElementById(`optThumb${n}`).classList.remove('selected');
   });
   document.getElementById('sliderContainer').classList.add('hidden');
+  document.getElementById('resultActions').classList.add('hidden');
+  ['imgBefore','imgAfter','tagBefore','tagAfter','baDivider','baHandle'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('baPlaceholder').classList.remove('hidden');
   const enhBtn = document.getElementById('btnEnhance');
   enhBtn.classList.add('hidden');
   enhBtn.disabled = false;
