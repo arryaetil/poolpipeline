@@ -700,9 +700,9 @@ async function run() {
   if (!address) { alert('Voer een adres in'); return; }
   if (!selectedFeatureId) { alert('Kies een product'); return; }
 
-  resetSteps();
-  chosenRenderSrc = null;
-  editedSrc = null;
+  const savedAddress = address;
+  reset();
+  document.getElementById('addrInput').value = savedAddress;
   document.getElementById('progressCard').classList.remove('hidden');
   document.getElementById('previewCard').classList.remove('hidden');
   document.getElementById('analysisCard').classList.remove('hidden');
