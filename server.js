@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadFeatures, makeSlug, sseEvent } from './pipeline/utils.js';
 import { geocode } from './pipeline/geocode.js';
+import { getMapProvider, validateGeocodingConfig } from './services/geocoding_provider.js';
 import { fetchSatellite } from './pipeline/satellite.js';
 import { analyse } from './pipeline/analysis.js';
 import { renderAll, renderGoogleDiagnostic, renderMapbox } from './pipeline/renders.js';
@@ -14,7 +15,6 @@ import { editImage, enhanceImage } from './pipeline/edit.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const CESIUM_ION_TOKEN = process.env.CESIUM_ION_TOKEN;
-const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const OR_KEY = process.env.OPENROUTER_KEY;
 const PORT = Number.parseInt(process.env.PORT || '3000', 10);
@@ -123,8 +123,18 @@ app.post('/run', async (req, res) => {
     return res.status(400).json({ error: `Unknown feature: ${featureId}` });
   }
 
-  if (!CESIUM_ION_TOKEN || !GOOGLE_KEY || !MAPBOX_TOKEN || !OR_KEY) {
-    return res.status(500).json({ error: 'CESIUM_ION_TOKEN, GOOGLE_KEY, MAPBOX_TOKEN, and OPENROUTER_KEY must be set in .env' });
+  try {
+    validateGeocodingConfig();
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+
+  if (!MAPBOX_TOKEN || !OR_KEY) {
+    return res.status(500).json({ error: 'MAPBOX_TOKEN and OPENROUTER_KEY must be set in .env' });
+  }
+
+  if (renderMode !== '2d' && !CESIUM_ION_TOKEN) {
+    return res.status(500).json({ error: 'CESIUM_ION_TOKEN must be set for 3d render mode. Use renderMode=2d for Mapbox-only MVP runs.' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -136,7 +146,7 @@ app.post('/run', async (req, res) => {
   let currentStep = 'geocode';
 
   try {
-    const geo = await geocode(address, GOOGLE_KEY);
+    const geo = await geocode(address);
     emit('step', { step: 'geocode', status: 'done', value: geo });
 
     const slug = makeSlug(geo.formatted, featureId);
@@ -222,6 +232,7 @@ app.post('/run', async (req, res) => {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   app.listen(PORT, HOST, () => {
     console.log(`BackyardAI running at http://${HOST}:${PORT}`);
+    console.log(`Geocoding provider: ${getMapProvider()}`);
   });
 }
 

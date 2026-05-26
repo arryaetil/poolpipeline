@@ -1,11 +1,5 @@
-export async function geocode(address, googleKey) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleKey}`;
-  const res = await fetch(url);
-  const json = await res.json();
-  if (json.status !== 'OK') throw new Error(`Geocoding failed: ${json.status}`);
-  const { lat, lng } = json.results[0].geometry.location;
-  const formatted = json.results[0].formatted_address;
-  const countryComponent = json.results[0].address_components.find(c => c.types.includes('country'));
-  const country = countryComponent?.long_name ?? 'unknown';
-  return { lat, lng, formatted, country };
+import { geocodeLocation } from '../services/geocoding_provider.js';
+
+export async function geocode(address) {
+  return geocodeLocation(address);
 }

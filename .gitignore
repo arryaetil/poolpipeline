@@ -1,6 +1,8 @@
 .env
 node_modules/
 output/
+.cache/
+logs/
 .superpowers/
 .claude/
 AQUAPURA_CLAUDE_CODE_PROMPT.md

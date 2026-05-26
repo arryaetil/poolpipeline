@@ -25,7 +25,12 @@ Open `http://localhost:3000` in je browser.
 
 | Variabele | Beschrijving | Vereist |
 |---|---|---|
-| `GOOGLE_KEY` | Google Cloud API-sleutel (Maps, Geocoding, 3D Tiles) | Ja |
+| `MAP_PROVIDER` | Geocoding-provider (`mapbox` standaard, `google` alleen legacy) | Nee |
+| `MAPBOX_TOKEN` | Mapbox token voor geocoding en satellietbeelden | Ja |
+| `MAX_API_CALLS_PER_DAY` | Harde daglimiet voor externe geocoding calls (standaard: `100`) | Nee |
+| `API_MIN_INTERVAL_MS` | Minimale pauze tussen externe geocoding calls (standaard: `1000`) | Nee |
+| `API_USAGE_TIMEZONE` | Timezone voor daglimiet-reset (standaard: `Europe/Amsterdam`) | Nee |
+| `GOOGLE_KEY` | Alleen nog nodig als `MAP_PROVIDER=google` legacy wordt gebruikt | Nee |
 | `OPENROUTER_KEY` | OpenRouter API-sleutel (Claude voor analyse en beeldbewerking) | Ja |
 | `PORT` | Serverpoort (standaard: `3000`) | Nee |
 | `SKIP_VIDEO` | Videogeneratie overslaan (`true` / `false`, standaard: `true`) | Nee |
@@ -34,7 +39,7 @@ Open `http://localhost:3000` in je browser.
 
 | Stap | Geschatte kosten |
 |---|---|
-| Geocoding + satellietfoto | ~$0.01 |
+| Mapbox geocoding + satellietfoto | afhankelijk van Mapbox plan/usage |
 | Google 3D Tiles (4 renders) | ~$0.10 |
 | Claude analyse (2 calls) | ~$0.05 |
 | AI beeldbewerking | ~$0.04 |
@@ -49,4 +54,10 @@ Zet de "Demo modus" toggle aan om een eerder gegenereerd resultaat te laden zond
 
 ```bash
 npm test
+```
+
+Veilige geocoding smoke test, met maximaal 5 adressen:
+
+```bash
+npm run test:geocoding
 ```

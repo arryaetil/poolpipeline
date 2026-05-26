@@ -3,21 +3,16 @@
 ## Prerequisites
 
 - Node.js 20 or later
-- Google Cloud billing enabled
+- Mapbox account and token
 - OpenRouter credits for the image and video model calls
-- Internet access for Google APIs, OpenRouter, and the Cesium CDN
+- Internet access for Mapbox, OpenRouter, and the Cesium CDN
 
-## Google Cloud API Key
+## Mapbox Token
 
-1. Open https://console.cloud.google.com
-2. Create or select a project.
-3. Enable billing on that project.
-4. Enable these APIs:
-   - Geocoding API
-   - Maps Static API
-   - Map Tiles API
-5. Create an API key from APIs & Services, Credentials.
-6. Put the key in `.env` as `GOOGLE_KEY`.
+1. Open https://account.mapbox.com
+2. Create or reuse a token.
+3. Put the token in `.env` as `MAPBOX_TOKEN`.
+4. Keep `MAP_PROVIDER=mapbox` for the MVP.
 
 ## OpenRouter API Key
 
@@ -37,7 +32,11 @@ cp .env.example .env
 The file should contain:
 
 ```env
-GOOGLE_KEY=paste_your_google_key_here
+MAP_PROVIDER=mapbox
+MAX_API_CALLS_PER_DAY=100
+API_MIN_INTERVAL_MS=1000
+API_USAGE_TIMEZONE=Europe/Amsterdam
+MAPBOX_TOKEN=paste_your_mapbox_token_here
 OPENROUTER_KEY=paste_your_openrouter_key_here
 PORT=3000
 HOST=127.0.0.1
@@ -83,5 +82,7 @@ Then restart the server.
 ## Notes
 
 - The final video step is the most expensive part.
+- Geocoding calls are cached in `.cache/geocoding-cache.json`, counted in `.cache/api-usage.json`, and logged to `logs/api-calls.jsonl`.
+- The pipeline stops before a geocoding request when `MAX_API_CALLS_PER_DAY` is reached.
 - If the run fails before video generation, fix that error before retrying to avoid repeated costs.
 - `output/` is ignored by git because it can contain large generated files.
